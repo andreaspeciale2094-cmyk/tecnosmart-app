@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>TecnoSmart Srl</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
+
+<!-- Android / Chrome -->
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TecnoSmart">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- Favicon -->
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+
+<style>
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background:#0b1220;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  #splash{
+    height:100%;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    padding:24px;
+    text-align:center;
+  }
+  #splash img{
+    width:112px;
+    height:112px;
+    border-radius:24px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.45);
+    background:#0b1220;
+  }
+  #splash h1{
+    color:#fff;
+    font-size:22px;
+    font-weight:800;
+    margin:0;
+    letter-spacing:.3px;
+  }
+  #splash p{
+    color:#93a2bd;
+    font-size:15px;
+    margin:0;
+  }
+  .spinner{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:3px solid rgba(255,152,0,0.25);
+    border-top-color:#ff9800;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  #fallback{
+    display:none;
+    margin-top:6px;
+  }
+  #fallback a{
+    color:#ff9800;
+    font-weight:700;
+    text-decoration:none;
+    border-bottom:2px solid rgba(255,152,0,0.4);
+  }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img src="icons/icon-192.png" alt="TecnoSmart">
+  <h1>TECNOSMART SRL</h1>
+  <div class="spinner"></div>
+  <p>Apertura dell'app in corso&hellip;</p>
+  <div id="fallback">
+    <p>Se non si apre automaticamente, <a id="fallbackLink" href="#">tocca qui</a>.</p>
+  </div>
+</div>
+
+<script>
+  // ==========================================================
+  // INCOLLA QUI SOTTO IL LINK DELLA TUA WEB APP (Apps Script)
+  // Esempio: "https://script.google.com/macros/s/AKfycb.../exec"
+  // ==========================================================
+  var APP_URL = https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec;
+
+  document.getElementById('fallbackLink').href = APP_URL;
+
+  // Mostra il link manuale se il redirect automatico non parte entro 2.5s
+  setTimeout(function(){
+    document.getElementById('fallback').style.display = 'block';
+  }, 2500);
+
+  setTimeout(function(){
+    window.location.replace(APP_URL);
+  }, 300);
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
+</script>
+
+</body>
+</html>
