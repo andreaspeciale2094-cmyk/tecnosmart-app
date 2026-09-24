@@ -1,5 +1,7 @@
-// Service worker minimo: serve solo a far risultare l'app "installabile"
-// dai browser (Chrome/Edge/Android). Non fa caching di nulla.
+// Service worker dell'app TecnoSmart:
+// - rende l'app "installabile" (Chrome/Edge/Android/iPhone)
+// - riceve le notifiche (codice di OneSignal importato qui sotto)
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
