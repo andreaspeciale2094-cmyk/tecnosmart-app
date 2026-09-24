@@ -8,14 +8,20 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b1220">
 
+<!-- Android / Chrome -->
 <meta name="mobile-web-app-capable" content="yes">
 
+<!-- iOS Safari -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TecnoSmart">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
+<!-- Favicon -->
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+
+<!-- Notifiche (OneSignal) -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <style>
   *{box-sizing:border-box;}
@@ -92,6 +98,16 @@
     display:none;
     margin-top:6px;
   }
+  /* Pulsante "Attiva notifiche": compare solo finche' le notifiche non sono
+     attive su questo dispositivo (e solo dove sono supportate). */
+  #notifBar{
+    position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);
+    display:none;align-items:center;gap:6px;z-index:10;
+    background:#ff9800;color:#1a0f00;border-radius:999px;box-shadow:0 6px 22px rgba(0,0,0,.45);
+    font-weight:800;font-size:15px;padding:4px 4px 4px 16px;white-space:nowrap;
+  }
+  #notifBar button{border:none;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:8px 6px;}
+  #notifBar #notifLater{font-size:18px;line-height:1;padding:8px 12px;opacity:.75;}
   #fallback a{
     color:#ff9800;
     font-weight:700;
@@ -102,9 +118,15 @@
 </head>
 <body>
 
+<!-- ==========================================================
+     INCOLLA QUI SOTTO IL LINK DELLA TUA WEB APP (Apps Script)
+     Esempio: "https://script.google.com/macros/s/AKfycb.../exec"
+     ========================================================== -->
 <iframe id="appFrame"
         src="https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec"
         allow="clipboard-read; clipboard-write"></iframe>
+
+<div id="notifBar"><button type="button" id="notifOn">🔔 Attiva notifiche</button><button type="button" id="notifLater" aria-label="Più tardi">✕</button></div>
 
 <div id="splash">
   <img src="icons/icon-192.png" alt="TecnoSmart">
@@ -123,6 +145,11 @@
 
   document.getElementById('fallbackLink').href = appFrame.src;
 
+  // Su Android/iOS l'altezza reale della finestra (senza barra indirizzi,
+  // con/senza tastiera, in modalità "app installata") non coincide sempre
+  // con 100vh: la calcoliamo noi in pixel e la teniamo aggiornata, cosi'
+  // l'iframe con l'app vera occupa esattamente lo schermo visibile, senza
+  // bisogno di scorrere.
   function setAppHeight() {
     var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
     document.documentElement.style.setProperty('--app-height', h + 'px');
@@ -141,13 +168,76 @@
 
   appFrame.addEventListener('load', hideSplash);
 
+  // Se dopo alcuni secondi il caricamento non è ancora scattato, mostra
+  // comunque il link di riserva (rete lenta, blocco, ecc.).
   setTimeout(function(){
     fallback.style.display = 'block';
   }, 4000);
 
+  // Service worker: lo stesso file sw.js serve sia per l'installazione sia per
+  // le notifiche (dentro importa quello di OneSignal). Lo registra OneSignal;
+  // qui lo si registra solo se non c'e' ancora, per non fare doppioni.
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.getRegistration('./').then(function(r){
+      if (!r) navigator.serviceWorker.register('sw.js').catch(function(){});
+    }).catch(function(){});
   }
+
+  // ================== NOTIFICHE (OneSignal) ==================
+  var ONESIGNAL_APP_ID = 'b726a932-2403-4455-becc-f48b6ef2c5a7';
+  var notifBar = document.getElementById('notifBar');
+  function lsGet(k){ try{ return localStorage.getItem(k); } catch(e){ return null; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, v); } catch(e){} }
+
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal){
+    await OneSignal.init({
+      appId: ONESIGNAL_APP_ID,
+      safari_web_id: 'web.onesignal.auto.1150f274-be67-4412-813c-e6f1ba6adf3e',
+      serviceWorkerPath: 'tecnosmart-app/sw.js',
+      serviceWorkerParam: { scope: '/tecnosmart-app/' },
+      notifyButton: { enable: false }
+    });
+    var slug = lsGet('tecnosmart-negozio');
+    if (slug) { try { OneSignal.User.addTag('negozio', slug); } catch(e){} }
+    refreshNotifBar();
+    OneSignal.Notifications.addEventListener('permissionChange', refreshNotifBar);
+  });
+
+  function refreshNotifBar(){
+    OneSignalDeferred.push(function(OneSignal){
+      var supported = OneSignal.Notifications.isPushSupported();
+      var granted = OneSignal.Notifications.permission === true;
+      var optedIn = OneSignal.User.PushSubscription.optedIn;
+      var later = Number(lsGet('tecnosmart-notif-later') || 0);
+      var show = supported && !(granted && optedIn) && Date.now() > later;
+      notifBar.style.display = show ? 'flex' : 'none';
+    });
+  }
+  document.getElementById('notifOn').addEventListener('click', function(){
+    OneSignalDeferred.push(async function(OneSignal){
+      try {
+        await OneSignal.Notifications.requestPermission();
+        if (OneSignal.Notifications.permission) await OneSignal.User.PushSubscription.optIn();
+      } catch(e){}
+      refreshNotifBar();
+    });
+  });
+  document.getElementById('notifLater').addEventListener('click', function(){
+    lsSet('tecnosmart-notif-later', String(Date.now() + 3*24*3600*1000)); // ricompare tra 3 giorni
+    notifBar.style.display = 'none';
+  });
+
+  // L'app (dentro il riquadro Google) comunica il negozio entrato: diventa il
+  // "tag" del dispositivo su OneSignal, cosi' i promemoria arrivano al negozio giusto.
+  window.addEventListener('message', function(e){
+    if (!/\.googleusercontent\.com$|^https:\/\/script\.google\.com$/.test(e.origin || '')) return;
+    var d = e.data || {};
+    if (d.type === 'tecnosmart-login' && typeof d.slug === 'string' && /^[a-z0-9-]{2,40}$/.test(d.slug)){
+      lsSet('tecnosmart-negozio', d.slug);
+      OneSignalDeferred.push(function(OneSignal){ try { OneSignal.User.addTag('negozio', d.slug); } catch(err){} });
+    }
+  });
 </script>
 
 </body>
