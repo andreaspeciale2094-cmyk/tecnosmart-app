@@ -2,10 +2,16 @@
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
       "source": { "source": "github", "repo": "anthropics/skills" }
+    },
+    "claude-code-skills": {
+      "source": { "source": "github", "repo": "alirezarezvani/claude-skills" }
     }
   },
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "a11y-audit@claude-code-skills": true,
+    "landing@claude-code-skills": true,
+    "security-guidance@claude-code-skills": true
   }
 }
