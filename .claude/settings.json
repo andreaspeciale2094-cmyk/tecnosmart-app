@@ -12,6 +12,8 @@
     "frontend-design@claude-plugins-official": true,
     "a11y-audit@claude-code-skills": true,
     "landing@claude-code-skills": true,
-    "security-guidance@claude-code-skills": true
+    "security-guidance@claude-code-skills": true,
+    "apple-hig-expert@claude-code-skills": true,
+    "example-skills@anthropic-agent-skills": true
   }
 }
