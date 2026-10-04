@@ -17,8 +17,13 @@ App di TecnoSmart Srl ("RUN Giornaliero e Report Dettagliato"), usata dai negozi
 - Il progetto Jarvis e' separato (repo `tecnsomart-app`): qui non c'entra.
 
 ## Plugin
-Configurati in `.claude/settings.json`: `document-skills` (Word, Excel, PDF, PowerPoint)
-e `frontend-design` (grafica).
+Configurati in `.claude/settings.json`: `document-skills` (Word, Excel, PDF, PowerPoint),
+`frontend-design` (grafica) e `security-guidance`.
+Nelle sessioni cloud `/plugin` non funziona, quindi questi strumenti sono **copiati come file** in
+`.claude/skills/` e funzionano sempre: `theme-factory` (temi), `webapp-testing` (test con screenshot),
+`canvas-design` (locandine), `web-artifacts-builder`, `a11y-audit` (accessibilita'), `apple-hig-expert`
+(grafica stile Apple), `landing` (pagine web). Gli ultimi tre vengono da `alirezarezvani/claude-skills`
+(di terzi): codice letto, nessuna chiamata di rete sospetta.
 
 ## Cosa ha chiesto l'utente (da conversazioni precedenti)
 - Lavoriamo su **questo** repo (`tecnosmart-app`, con la "o"). Il repo `tecnsomart-app` (senza "o") contiene
