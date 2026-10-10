@@ -114,24 +114,6 @@
     text-decoration:none;
     border-bottom:2px solid rgba(255,152,0,0.4);
   }
-
-  /* Preventivatore Protecta: si apre sopra l'app, con il tasto per tornare indietro */
-  #prevOverlay{
-    position:fixed;inset:0;z-index:20;display:none;flex-direction:column;
-    height:calc(var(--app-height, 100vh));background:#0b1220;
-  }
-  #prevOverlay.open{display:flex;}
-  #prevBar{
-    display:flex;align-items:center;gap:12px;flex:none;color:#fff;
-    padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top, 0px));
-    background:#0b1220;border-bottom:1px solid rgba(255,255,255,.12);
-  }
-  #prevBack{
-    border:none;background:#ff9800;color:#1a0f00;font:inherit;font-weight:800;font-size:15px;
-    border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;
-  }
-  #prevTitle{font-weight:800;font-size:16px;letter-spacing:.2px;}
-  #prevFrame{flex:1;width:100%;border:none;background:#0b1220;min-height:0;}
 </style>
 </head>
 <body>
@@ -145,14 +127,6 @@
         allow="clipboard-read; clipboard-write"></iframe>
 
 <div id="notifBar"><button type="button" id="notifOn">🔔 Attiva notifiche</button><button type="button" id="notifLater" aria-label="Più tardi">✕</button></div>
-
-<div id="prevOverlay" role="dialog" aria-label="Preventivatore Protecta">
-  <div id="prevBar">
-    <button type="button" id="prevBack">&larr; Torna all'app</button>
-    <span id="prevTitle">Preventivatore Protecta</span>
-  </div>
-  <iframe id="prevFrame" title="Preventivatore Protecta" allow="clipboard-write"></iframe>
-</div>
 
 <div id="splash">
   <img src="icons/icon-192.png" alt="TecnoSmart">
@@ -254,24 +228,6 @@
     notifBar.style.display = 'none';
   });
 
-  // ================== PREVENTIVATORE PROTECTA ==================
-  // Il tasto "Preventivatore Protecta" dentro l'app manda un messaggio qui:
-  // il preventivatore si apre sopra l'app (senza uscire) e "Torna all'app" lo chiude.
-  var prevOverlay = document.getElementById('prevOverlay');
-  var prevFrame = document.getElementById('prevFrame');
-  function openPreventivatore(){
-    if (!prevFrame.getAttribute('src')) prevFrame.setAttribute('src', 'preventivatore.html');
-    prevOverlay.classList.add('open');
-    try { history.pushState({prev:1}, ''); } catch(e){}
-  }
-  function closePreventivatore(fromPop){
-    if (!prevOverlay.classList.contains('open')) return;
-    prevOverlay.classList.remove('open');
-    if (!fromPop) { try { if (history.state && history.state.prev) history.back(); } catch(e){} }
-  }
-  document.getElementById('prevBack').addEventListener('click', function(){ closePreventivatore(false); });
-  window.addEventListener('popstate', function(){ closePreventivatore(true); });
-
   // L'app (dentro il riquadro Google) comunica il negozio entrato: diventa il
   // "tag" del dispositivo su OneSignal, cosi' i promemoria arrivano al negozio giusto.
   window.addEventListener('message', function(e){
@@ -281,7 +237,6 @@
       lsSet('tecnosmart-negozio', d.slug);
       OneSignalDeferred.push(function(OneSignal){ try { OneSignal.User.addTag('negozio', d.slug); } catch(err){} });
     }
-    if (d.type === 'tecnosmart-open' && d.page === 'preventivatore') openPreventivatore();
   });
 </script>
 
