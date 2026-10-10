@@ -170,6 +170,7 @@ a.btn{display:flex;align-items:center;justify-content:center;text-decoration:non
               <select id="c-tipo"><option>Appartamento</option><option>Villa</option><option>Negozio</option><option>Ufficio</option><option>Magazzino</option></select>
             </label>
             <label class="f full" for="c-ind">Indirizzo dell'impianto<input id="c-ind" type="text" autocomplete="off"></label>
+            <label class="chk full" for="c-sopr"><input id="c-sopr" type="checkbox"><span>Sopralluogo già effettuato</span></label>
           </div>
         </section>
         <section class="panel">
@@ -239,7 +240,7 @@ function num(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?
 function img(key,cls){return IMG[key]?'<img class="thumb '+(cls||'')+'" src="'+IMG[key]+'" alt="" loading="lazy">':'<span class="thumb ph '+(cls||'')+'"></span>';}
 
 var DEFAULT={
-  azienda:{nome:'',tel:'',email:'',note:'Preventivo indicativo e non vincolante. Le immagini sono a scopo illustrativo: il prodotto reale può differire per colore, forma o caratteristiche.'},
+  azienda:{nome:'TecnoSmart Srl',tel:'',email:'',note:'Preventivo indicativo e non vincolante. Le immagini sono a scopo illustrativo: il prodotto reale può differire per colore, forma o caratteristiche.'},
   iva:0.22,
   sconti:{k250:250,k125:125,k100:100,k100m:10,conv:10},
   coef:{ /* rata mensile ogni 1.000 euro di importo tabellare */
@@ -285,6 +286,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(cat));}catch(e){}}
 var cat=load();
 
 var state={kit:'casa',qty:{},sconto:'none',conv:false,fin:0,fz:'compass'};
+function sopr(){return !!($('c-sopr')&&$('c-sopr').checked);}
 function client(){return{nome:$('c-nome').value.trim(),tel:$('c-tel').value.trim(),email:$('c-email').value.trim(),tipo:$('c-tipo').value,ind:$('c-ind').value.trim()};}
 function kitOf(){return cat.kits.filter(function(k){return k.id===state.kit;})[0]||cat.kits[0];}
 function kitPrice(k){return k.iva?k.price*(1+cat.iva):k.price;}
@@ -382,7 +384,7 @@ function renderSummary(){
 function dateIt(){return new Date().toLocaleDateString('it-IT');}
 function renderFoglio(c){
   var cl=client(),a=cat.azienda,solo=c.solo;
-  $('b-mail').href='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(cl.email)+'&su='+encodeURIComponent('Preventivo allarme'+(cl.nome?' - '+cl.nome:''))+'&body='+encodeURIComponent(textQuote());
+  $('b-mail').href='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(cl.email)+'&su='+encodeURIComponent('Preventivo impianto di allarme'+(cl.nome?' - '+cl.nome:''))+'&body='+encodeURIComponent(textQuote());
   var rows='';
   lineList(c).forEach(function(x){
     var im=x.key&&IMG[x.key]?'<img src="'+IMG[x.key]+'" alt="">':'';
@@ -410,22 +412,28 @@ function renderFoglio(c){
 
 function textQuote(){
   var c=calc(),cl=client(),a=cat.azienda,t=[];
-  t.push('PREVENTIVO ALLARME - '+dateIt());
-  if(a.nome)t.push(a.nome);
+  t.push('Gentile '+(cl.nome||'Cliente')+',');
   t.push('');
-  t.push('Cliente: '+(cl.nome||'-')+(cl.tel?' - '+cl.tel:''));
-  t.push('Impianto: '+cl.tipo+(cl.ind?', '+cl.ind:''));
+  var dove=cl.ind?cl.ind:'la Sua abitazione';
+  if(sopr())t.push('La ringraziamo per la cortese accoglienza. A seguito del sopralluogo effettuato presso '+dove+', Le trasmettiamo di seguito il preventivo per l\'impianto di allarme.');
+  else t.push('La ringraziamo per l\'interesse dimostrato per il nostro servizio di allarme. Come richiesto, Le trasmettiamo di seguito il preventivo per l\'impianto presso '+dove+'.');
+  t.push('');
+  t.push('PREVENTIVO ALLARME del '+dateIt());
   t.push('');
   t.push(c.kit.name+': '+eur(c.kp));
   if(c.kit.inc.length)t.push('('+c.kit.inc.map(function(r){return r[0]+' '+r[1];}).join(', ')+')');
   c.extras.forEach(function(x){t.push('- '+x.q+' x '+x.i.name+': '+eur(x.i.price*x.q));});
   if(c.dK>0)t.push('Sconto sul kit: -'+eur(c.dK));
   t.push('');
-  t.push('COSTO DEL KIT: '+eur(c.once)+' (IVA inclusa)');
-  t.push('CANONE AL MESE: '+eur(c.monthly)+(c.dM>0?' (sconto canone compreso)':''));
-  if(c.fin>0)t.push('RATA MENSILE: '+eur(c.rata)+' per '+c.mesi+' mesi (kit e servizio), indicativa');
+  t.push('Costo del kit: '+eur(c.once)+' (IVA inclusa)');
+  t.push('Canone mensile: '+eur(c.monthly)+(c.dM>0?' (sconto sul canone già applicato)':''));
+  if(c.fin>0)t.push('Rata mensile: '+eur(c.rata)+' per '+c.mesi+' mesi (comprende kit e servizio, importo indicativo)');
   t.push('');
-  if(a.note)t.push(a.note);
+  if(sopr())t.push('Il presente preventivo è stato redatto sulla base del sopralluogo già effettuato ed è indicativo e non vincolante. Restiamo a Sua completa disposizione per qualsiasi chiarimento.');
+  else t.push('Il presente preventivo è indicativo e non vincolante. Restiamo a Sua completa disposizione per qualsiasi chiarimento e per fissare, se lo desidera, un sopralluogo gratuito.');
+  t.push('');
+  t.push('Cordiali saluti');
+  t.push(a.nome||'TecnoSmart Srl');
   if(a.tel||a.email)t.push([a.tel,a.email].filter(Boolean).join(' - '));
   return t.join('\n');
 }
@@ -500,7 +508,7 @@ $('o-sconto').addEventListener('change',function(){state.sconto=this.value;rende
 $('o-conv').addEventListener('change',function(){state.conv=this.checked;renderSummary();});
 $('o-fin').addEventListener('change',function(){state.fin=parseInt(this.value,10)||0;renderCond();renderSummary();});
 $('o-fz').addEventListener('change',function(){state.fz=this.value;renderCond();renderSummary();});
-['c-nome','c-tel','c-email','c-tipo','c-ind'].forEach(function(id){
+['c-nome','c-tel','c-email','c-tipo','c-ind','c-sopr'].forEach(function(id){
   $(id).addEventListener('input',function(){renderFoglio(calc());});
   $(id).addEventListener('change',function(){renderFoglio(calc());});
 });
@@ -530,7 +538,7 @@ $('b-new').addEventListener('click',function(){
   if(!newArmed){newArmed=true;this.textContent='Tocca ancora per cancellare';clearTimeout(newT);var b=this;newT=setTimeout(function(){newArmed=false;b.textContent='Nuovo preventivo';},3500);return;}
   newArmed=false;this.textContent='Nuovo preventivo';
   ['c-nome','c-tel','c-email','c-ind'].forEach(function(id){$(id).value='';});
-  $('c-tipo').selectedIndex=0;
+  $('c-tipo').selectedIndex=0;$('c-sopr').checked=false;
   state={kit:'casa',qty:{},sconto:'none',conv:false,fin:0,fz:'compass'};
   renderKits();renderInc();renderItems();renderCond();renderSummary();toast('Preventivo azzerato.');
 });
