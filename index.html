@@ -108,7 +108,7 @@
   }
   #notifBar button{border:none;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:8px 6px;}
   #notifBar #notifLater{font-size:18px;line-height:1;padding:8px 12px;opacity:.75;}
-  /* Bottone "Disdette": apre la posta con la PEC delle disdette gia' compilata. */
+  /* Bottone "Disdette": apre il login Aruba della PEC delle disdette. */
   #pecBtn{
     position:fixed;right:14px;bottom:calc(78px + env(safe-area-inset-bottom, 0px));z-index:9;
     display:flex;align-items:center;gap:6px;
@@ -134,7 +134,7 @@
         src="https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec"
         allow="clipboard-read; clipboard-write"></iframe>
 
-<a id="pecBtn" href="mailto:serviziodisdetteweb@pec.it?subject=Richiesta%20di%20disdetta">✉️ PEC Disdette</a>
+<a id="pecBtn" href="https://login.aruba.it/auth/realms/pec/protocol/openid-connect/auth" target="_blank" rel="noopener">✉️ PEC Disdette</a>
 
 <div id="notifBar"><button type="button" id="notifOn">🔔 Attiva notifiche</button><button type="button" id="notifLater" aria-label="Più tardi">✕</button></div>
 
