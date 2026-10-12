@@ -108,6 +108,14 @@
   }
   #notifBar button{border:none;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:8px 6px;}
   #notifBar #notifLater{font-size:18px;line-height:1;padding:8px 12px;opacity:.75;}
+  /* Bottone "Disdette": apre la posta con la PEC delle disdette gia' compilata. */
+  #pecBtn{
+    position:fixed;right:14px;bottom:calc(78px + env(safe-area-inset-bottom, 0px));z-index:9;
+    display:flex;align-items:center;gap:6px;
+    background:#16213a;color:#fff;border:1px solid rgba(255,152,0,.6);border-radius:999px;
+    box-shadow:0 6px 22px rgba(0,0,0,.45);
+    font-weight:700;font-size:14px;padding:10px 16px;text-decoration:none;white-space:nowrap;
+  }
   #fallback a{
     color:#ff9800;
     font-weight:700;
@@ -125,6 +133,8 @@
 <iframe id="appFrame"
         src="https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec"
         allow="clipboard-read; clipboard-write"></iframe>
+
+<a id="pecBtn" href="mailto:serviziodisdetteweb@pec.it?subject=Richiesta%20di%20disdetta">✉️ PEC Disdette</a>
 
 <div id="notifBar"><button type="button" id="notifOn">🔔 Attiva notifiche</button><button type="button" id="notifLater" aria-label="Più tardi">✕</button></div>
 
@@ -162,8 +172,7 @@
   }
 
   function hideSplash() {
-    splash.classList.add('fade-out');
-    setTimeout(function(){ splash.style.display = 'none'; }, 400);
+    splash.classList.add('fade-out');    setTimeout(function(){ splash.style.display = 'none'; }, 400);
   }
 
   appFrame.addEventListener('load', hideSplash);
