@@ -26,8 +26,9 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 .mese{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .mese button{font-size:22px;background:#0d2438;color:#fff;border:0;border-radius:10px;padding:6px 14px}
 .mese b{text-transform:capitalize}
-.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0d2438;font-size:18px}
-.tot{font-size:22px;font-weight:700;color:#fff;border:0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #0d2438;font-size:18px}
+.sub{font-size:15px;color:#7cc4ff;padding:2px 0 8px 14px}
+.tot{font-size:19px;font-weight:700;color:#fff;border:0}
 .corsa{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0d2438}
 .corsa small{color:#9ca3af;display:block}
 .corsa button{background:none;border:0;color:#f87171;font-size:22px}
@@ -72,6 +73,9 @@ function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){
 function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert("Impossibile salvare su questo telefono")}}
 function euro(n){return n.toLocaleString("it-IT",{style:"currency",currency:"EUR"})}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var UBER_PERC=7;
+function righe(t){var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(t[m]||0)+'</span></div>';
+  if(m==="Uber")h+='<div class="row sub"><span>Uber netto (-'+UBER_PERC+'%)</span><span>'+euro((t[m]||0)*(100-UBER_PERC)/100)+'</span></div>'});return h}
 function chiave(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
 
 function disegnaPay(){
@@ -88,12 +92,12 @@ function disegna(){
   document.getElementById("nome").textContent=vista.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
   var tot={},somma=0;METODI.forEach(function(m){tot[m]=0});
   corse.forEach(function(c){tot[c.metodo]=(tot[c.metodo]||0)+c.importo;somma+=c.importo});
-  var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(tot[m])+'</span></div>'});
+  var h=righe(tot);
   h+='<div class="row tot"><span>Totale ('+corse.length+(corse.length===1?' corsa':' corse')+')</span><span>'+euro(somma)+'</span></div>';
   document.getElementById("totali").innerHTML=h;
   var ay=String(giorno.getFullYear()),at={},asum=0,an=0;METODI.forEach(function(m){at[m]=0});
   tutte.forEach(function(c){if(c.data.slice(0,4)===ay){at[c.metodo]=(at[c.metodo]||0)+c.importo;asum+=c.importo;an++}});
-  var ah="";METODI.forEach(function(m){ah+='<div class="row"><span>'+m+'</span><span>'+euro(at[m])+'</span></div>'});
+  var ah=righe(at);
   ah+='<div class="row tot"><span>Totale ('+an+(an===1?' corsa':' corse')+')</span><span>'+euro(asum)+'</span></div>';
   document.getElementById("anome").textContent=ay;document.getElementById("atotali").innerHTML=ah;
   var gi=isoG(giorno),gc=tutte.filter(function(c){return c.data===gi}),gs=0;
@@ -101,7 +105,7 @@ function disegna(){
   var oggi=isoG(new Date());
   document.getElementById("gnome").textContent=(gi===oggi?"Oggi · ":"")+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});
   var gt={};METODI.forEach(function(m){gt[m]=0});gc.forEach(function(c){gt[c.metodo]=(gt[c.metodo]||0)+c.importo});
-  var gh="";METODI.forEach(function(m){gh+='<div class="row"><span>'+m+'</span><span>'+euro(gt[m])+'</span></div>'});
+  var gh=righe(gt);
   gh+='<div class="row tot"><span>Totale giorno ('+gc.length+(gc.length===1?' corsa':' corse')+')</span><span>'+euro(gs)+'</span></div>';
   document.getElementById("gtotali").innerHTML=gh;
   document.getElementById("add").textContent="+ Aggiungi corsa"+(gi===oggi?"":" · "+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"}));
