@@ -45,7 +45,7 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
   <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
   <div id="totali"></div>
   <div class="mese" style="margin-top:22px"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div>
-  <div class="row" style="border:0;color:#9ca3af;font-size:15px"><span id="gcount"></span><span id="gtot"></span></div>
+  <div id="gtotali"></div>
   <div id="lista"></div>
 </div>
 
@@ -82,8 +82,10 @@ function disegna(){
   gc.forEach(function(c){gs+=c.importo});
   var oggi=isoG(new Date());
   document.getElementById("gnome").textContent=(gi===oggi?"Oggi · ":"")+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});
-  document.getElementById("gcount").textContent=gc.length+(gc.length===1?" corsa":" corse");
-  document.getElementById("gtot").textContent=euro(gs);
+  var gt={};METODI.forEach(function(m){gt[m]=0});gc.forEach(function(c){gt[c.metodo]=(gt[c.metodo]||0)+c.importo});
+  var gh="";METODI.forEach(function(m){gh+='<div class="row"><span>'+m+'</span><span>'+euro(gt[m])+'</span></div>'});
+  gh+='<div class="row tot"><span>Totale giorno ('+gc.length+(gc.length===1?' corsa':' corse')+')</span><span>'+euro(gs)+'</span></div>';
+  document.getElementById("gtotali").innerHTML=gh;
   document.getElementById("add").textContent="+ Aggiungi corsa"+(gi===oggi?"":" · "+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"}));
   var l="";
   gc.slice().reverse().forEach(function(c){
