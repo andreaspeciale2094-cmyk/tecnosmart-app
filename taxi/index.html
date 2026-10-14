@@ -19,6 +19,10 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 .pay button{padding:16px 4px;font-size:16px;border-radius:12px;border:2px solid #0d2438;background:#0d2438;color:#fff}
 .pay button.on{border-color:#1da1ff;background:#1da1ff;color:#fff}
 .add{width:100%;margin-top:16px;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#1da1ff;color:#fff}
+.tabs{display:flex;gap:6px;background:#000;border-radius:14px;padding:4px;margin-bottom:14px}
+.tabs button{flex:1;padding:12px 4px;font-size:16px;font-weight:600;border:0;border-radius:11px;background:none;color:#9ca3af}
+.tabs button.on{background:#1da1ff;color:#fff}
+[hidden]{display:none!important}
 .mese{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .mese button{font-size:22px;background:#0d2438;color:#fff;border:0;border-radius:10px;padding:6px 14px}
 .mese b{text-transform:capitalize}
@@ -42,11 +46,16 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 </div>
 
 <div class="card">
-  <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
-  <div id="totali"></div>
-  <div class="mese" style="margin-top:22px"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div>
-  <div id="gtotali"></div>
-  <div id="lista"></div>
+  <div class="tabs"><button id="tG" class="on">Giornaliero</button><button id="tM">Mese</button></div>
+  <div id="vM" hidden>
+    <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
+    <div id="totali"></div>
+  </div>
+  <div id="vG">
+    <div class="mese"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div>
+    <div id="gtotali"></div>
+    <div id="lista"></div>
+  </div>
 </div>
 
 <script>
@@ -113,5 +122,9 @@ document.getElementById("prev").onclick=function(){vaiMese(-1)};
 document.getElementById("next").onclick=function(){vaiMese(1)};
 document.getElementById("gprev").onclick=function(){vaiGiorno(-1)};
 document.getElementById("gnext").onclick=function(){vaiGiorno(1)};
-disegnaPay();disegna();
+function tab(v){document.getElementById("vG").hidden=v!=="G";document.getElementById("vM").hidden=v!=="M";
+  document.getElementById("tG").className=v==="G"?"on":"";document.getElementById("tM").className=v==="M"?"on":""}
+document.getElementById("tG").onclick=function(){tab("G")};
+document.getElementById("tM").onclick=function(){tab("M")};
+disegnaPay();disegna();tab("G");
 </script></body></html>
