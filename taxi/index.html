@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<title>Corse Taxi</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:#111827;color:#f9fafb;padding:16px;max-width:480px;margin:auto}
+h1{font-size:22px;margin:0}
+.head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.logo{width:72px;height:72px;margin:0;border-radius:16px;background:#1f2937;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;font-size:30px;color:#fff;flex:none}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo small{display:block;font-size:10px;color:#9ca3af}
+.card{background:#1f2937;border-radius:16px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:14px;color:#9ca3af;margin:10px 0 4px}
+input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;background:#374151;color:#fff}
+.pay{display:flex;gap:8px;margin-top:4px}
+.pay button{flex:1;padding:14px 4px;font-size:16px;border-radius:12px;border:2px solid #374151;background:#374151;color:#fff}
+.pay button.on{border-color:#facc15;background:#facc15;color:#111}
+.add{width:100%;margin-top:16px;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#22c55e;color:#052e16}
+.mese{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.mese button{font-size:22px;background:#374151;color:#fff;border:0;border-radius:10px;padding:6px 14px}
+.mese b{text-transform:capitalize}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #374151;font-size:18px}
+.tot{font-size:22px;font-weight:700;color:#facc15;border:0}
+.corsa{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #374151}
+.corsa small{color:#9ca3af;display:block}
+.corsa button{background:none;border:0;color:#f87171;font-size:22px}
+.vuoto{color:#9ca3af;text-align:center;padding:10px}
+</style></head><body>
+<div class="head"><label class="logo" id="logoBox" title="Tocca per mettere il tuo logo"><img id="logo" alt="" hidden><span id="logoVuoto">🚕<small>Metti il logo</small></span><input type="file" id="logoFile" accept="image/*" hidden></label><h1>Corse Taxi</h1></div>
+
+<div class="card">
+  <label>Importo (€)</label>
+  <input id="importo" type="number" inputmode="decimal" step="0.01" placeholder="0,00">
+  <label>Luogo</label>
+  <input id="luogo" type="text" placeholder="Es. Stazione → Aeroporto" style="font-size:18px">
+  <label>Come ha pagato</label>
+  <div class="pay" id="pay"></div>
+  <button class="add" id="add">+ Aggiungi corsa</button>
+</div>
+
+<div class="card">
+  <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
+  <div id="totali"></div>
+  <h3 style="margin:18px 0 0;font-size:15px;color:#9ca3af">Corse del mese</h3>
+  <div id="lista"></div>
+</div>
+
+<script>
+var METODI=["Contanti","Carta","Altro"];
+var KEY="corse_taxi_v1";
+var metodo=METODI[0], vista=new Date(); vista.setDate(1);
+function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert("Impossibile salvare su questo telefono")}}
+function euro(n){return n.toLocaleString("it-IT",{style:"currency",currency:"EUR"})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function chiave(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
+
+function disegnaPay(){
+  var el=document.getElementById("pay");el.innerHTML="";
+  METODI.forEach(function(m){
+    var b=document.createElement("button");b.textContent=m;
+    if(m===metodo)b.className="on";
+    b.onclick=function(){metodo=m;disegnaPay()};el.appendChild(b);
+  });
+}
+function disegna(){
+  var k=chiave(vista), tutte=carica();
+  var corse=tutte.filter(function(c){return c.data.slice(0,7)===k});
+  document.getElementById("nome").textContent=vista.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
+  var tot={},somma=0;METODI.forEach(function(m){tot[m]=0});
+  corse.forEach(function(c){tot[c.metodo]=(tot[c.metodo]||0)+c.importo;somma+=c.importo});
+  var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(tot[m])+'</span></div>'});
+  h+='<div class="row tot"><span>Totale ('+corse.length+' corse)</span><span>'+euro(somma)+'</span></div>';
+  document.getElementById("totali").innerHTML=h;
+  var l="";
+  corse.slice().reverse().forEach(function(c){
+    var g=c.data.slice(8,10)+"/"+c.data.slice(5,7);
+    l+='<div class="corsa"><div><b>'+euro(c.importo)+'</b> · '+esc(c.metodo)+'<small>'+g+(c.luogo?" · "+esc(c.luogo):"")+'</small></div><button data-id="'+c.id+'" aria-label="Elimina">✕</button></div>';
+  });
+  var le=document.getElementById("lista");
+  le.innerHTML=l||'<div class="vuoto">Nessuna corsa in questo mese</div>';
+  le.querySelectorAll("button").forEach(function(b){b.onclick=function(){
+    if(confirm("Eliminare questa corsa?")){salva(carica().filter(function(c){return String(c.id)!==b.dataset.id}));disegna()}}});
+}
+document.getElementById("add").onclick=function(){
+  var imp=parseFloat(document.getElementById("importo").value.replace(",","."));
+  if(!(imp>0)){alert("Scrivi l'importo della corsa");return}
+  var n=new Date(),d=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+  var t=carica();
+  t.push({id:Date.now(),data:d,importo:imp,luogo:document.getElementById("luogo").value.trim(),metodo:metodo});
+  salva(t);
+  document.getElementById("importo").value="";document.getElementById("luogo").value="";
+  vista=new Date();vista.setDate(1);disegna();
+};
+document.getElementById("prev").onclick=function(){vista.setMonth(vista.getMonth()-1);disegna()};
+document.getElementById("next").onclick=function(){vista.setMonth(vista.getMonth()+1);disegna()};
+disegnaPay();disegna();
+</script></body></html>
