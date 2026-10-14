@@ -115,8 +115,10 @@ document.getElementById("add").onclick=function(){
   document.getElementById("importo").value="";document.getElementById("luogo").value="";
   disegna();
 };
-function vaiMese(n){vista.setMonth(vista.getMonth()+n);var t=new Date();
-  giorno=(vista.getFullYear()===t.getFullYear()&&vista.getMonth()===t.getMonth())?t:new Date(vista.getFullYear(),vista.getMonth(),1);disegna()}
+function vaiMese(n){var t=new Date(),y=giorno.getFullYear(),m=giorno.getMonth()+n;
+  if(n>0&&(y>t.getFullYear()||(y===t.getFullYear()&&giorno.getMonth()>=t.getMonth())))return;
+  var ult=new Date(y,m+1,0).getDate(),d=new Date(y,m,Math.min(giorno.getDate(),ult));
+  giorno=d>t?t:d;vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
 function vaiGiorno(n){if(n>0&&isoG(giorno)>=isoG(new Date()))return;giorno=new Date(giorno.getFullYear(),giorno.getMonth(),giorno.getDate()+n);vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
 document.getElementById("prev").onclick=function(){vaiMese(-1)};
 document.getElementById("next").onclick=function(){vaiMese(1)};
