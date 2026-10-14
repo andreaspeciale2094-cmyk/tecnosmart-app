@@ -74,8 +74,8 @@ function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert
 function euro(n){return n.toLocaleString("it-IT",{style:"currency",currency:"EUR"})}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var UBER_PERC=7;
-function righe(t){var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(t[m]||0)+'</span></div>';
-  if(m==="Uber")h+='<div class="row sub"><span>Uber netto (-'+UBER_PERC+'%)</span><span>'+euro((t[m]||0)*(100-UBER_PERC)/100)+'</span></div>'});return h}
+function righe(t){var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+(m==="Uber"?"Uber (lordo)":m)+'</span><span>'+euro(t[m]||0)+'</span></div>';
+  if(m==="Uber")h+='<div class="row sub"><span>Uber (netto)</span><span>'+euro((t[m]||0)*(100-UBER_PERC)/100)+'</span></div>'});return h}
 function chiave(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
 
 function disegnaPay(){
