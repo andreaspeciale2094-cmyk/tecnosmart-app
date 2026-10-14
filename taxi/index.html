@@ -76,7 +76,7 @@ function disegna(){
   var tot={},somma=0;METODI.forEach(function(m){tot[m]=0});
   corse.forEach(function(c){tot[c.metodo]=(tot[c.metodo]||0)+c.importo;somma+=c.importo});
   var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(tot[m])+'</span></div>'});
-  h+='<div class="row tot"><span>Totale ('+corse.length+' corse)</span><span>'+euro(somma)+'</span></div>';
+  h+='<div class="row tot"><span>Totale ('+corse.length+(corse.length===1?' corsa':' corse')+')</span><span>'+euro(somma)+'</span></div>';
   document.getElementById("totali").innerHTML=h;
   var gi=isoG(giorno),gc=tutte.filter(function(c){return c.data===gi}),gs=0;
   gc.forEach(function(c){gs+=c.importo});
@@ -106,7 +106,7 @@ document.getElementById("add").onclick=function(){
 };
 function vaiMese(n){vista.setMonth(vista.getMonth()+n);var t=new Date();
   giorno=(vista.getFullYear()===t.getFullYear()&&vista.getMonth()===t.getMonth())?t:new Date(vista.getFullYear(),vista.getMonth(),1);disegna()}
-function vaiGiorno(n){giorno=new Date(giorno.getFullYear(),giorno.getMonth(),giorno.getDate()+n);vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
+function vaiGiorno(n){if(n>0&&isoG(giorno)>=isoG(new Date()))return;giorno=new Date(giorno.getFullYear(),giorno.getMonth(),giorno.getDate()+n);vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
 document.getElementById("prev").onclick=function(){vaiMese(-1)};
 document.getElementById("next").onclick=function(){vaiMese(1)};
 document.getElementById("gprev").onclick=function(){vaiGiorno(-1)};
