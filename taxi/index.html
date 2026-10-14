@@ -1,35 +1,35 @@
 <!doctype html>
 <html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827">
-<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
-<title>Corse Taxi</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Bomber 17</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,sans-serif;background:#111827;color:#f9fafb;padding:16px;max-width:480px;margin:auto}
+body{margin:0;font-family:system-ui,sans-serif;background:#000;color:#f9fafb;padding:16px;max-width:480px;margin:auto;overflow-x:hidden;-webkit-text-size-adjust:100%}
 h1{font-size:22px;margin:0}
 .head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.logo{width:72px;height:72px;margin:0;border-radius:16px;background:#1f2937;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;font-size:30px;color:#fff;flex:none}
+.logo{width:84px;height:84px;margin:0;border-radius:16px;background:#0a0f1f;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;font-size:30px;color:#fff;flex:none}
 .logo img{width:100%;height:100%;object-fit:contain}
 .logo small{display:block;font-size:10px;color:#9ca3af}
-.card{background:#1f2937;border-radius:16px;padding:16px;margin-bottom:16px}
+.card{border:1px solid #16203a;background:#0a0f1f;border-radius:16px;padding:16px;margin-bottom:16px}
 label{display:block;font-size:14px;color:#9ca3af;margin:10px 0 4px}
-input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;background:#374151;color:#fff}
+input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;background:#16203a;color:#fff}
 .pay{display:flex;gap:8px;margin-top:4px}
-.pay button{flex:1;padding:14px 4px;font-size:16px;border-radius:12px;border:2px solid #374151;background:#374151;color:#fff}
-.pay button.on{border-color:#facc15;background:#facc15;color:#111}
-.add{width:100%;margin-top:16px;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#22c55e;color:#052e16}
+.pay button{flex:1;padding:14px 4px;font-size:16px;border-radius:12px;border:2px solid #16203a;background:#16203a;color:#fff}
+.pay button.on{border-color:#1f5fff;background:#1f5fff;color:#fff}
+.add{width:100%;margin-top:16px;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#1f5fff;color:#fff}
 .mese{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.mese button{font-size:22px;background:#374151;color:#fff;border:0;border-radius:10px;padding:6px 14px}
+.mese button{font-size:22px;background:#16203a;color:#fff;border:0;border-radius:10px;padding:6px 14px}
 .mese b{text-transform:capitalize}
-.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #374151;font-size:18px}
-.tot{font-size:22px;font-weight:700;color:#facc15;border:0}
-.corsa{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #374151}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #16203a;font-size:18px}
+.tot{font-size:22px;font-weight:700;color:#fff;border:0}
+.corsa{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #16203a}
 .corsa small{color:#9ca3af;display:block}
 .corsa button{background:none;border:0;color:#f87171;font-size:22px}
 .vuoto{color:#9ca3af;text-align:center;padding:10px}
 </style></head><body>
-<div class="head"><label class="logo" id="logoBox" title="Tocca per mettere il tuo logo"><img id="logo" alt="" hidden><span id="logoVuoto">🚕<small>Metti il logo</small></span><input type="file" id="logoFile" accept="image/*" hidden></label><h1>Corse Taxi</h1></div>
+<div class="head"><label class="logo" id="logoBox" title="Tocca per cambiare il logo"><img id="logo" alt="Bomber 17" src="logo.png"><input type="file" id="logoFile" accept="image/*" hidden></label><h1>Bomber 17<small style="display:block;font-size:13px;font-weight:400;color:#9ca3af">Le mie corse</small></h1></div>
 
 <div class="card">
   <label>Importo (€)</label>
