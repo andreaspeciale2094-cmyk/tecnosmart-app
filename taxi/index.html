@@ -15,8 +15,8 @@ h1{font-size:26px;margin:0;letter-spacing:1px}
 .card{border:1px solid #0d2438;background:#07131f;border-radius:16px;padding:16px;margin-bottom:16px}
 label{display:block;font-size:14px;color:#9ca3af;margin:10px 0 4px}
 input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;background:#0d2438;color:#fff}
-.pay{display:flex;gap:8px;margin-top:4px}
-.pay button{flex:1;padding:14px 4px;font-size:16px;border-radius:12px;border:2px solid #0d2438;background:#0d2438;color:#fff}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.pay button{padding:16px 4px;font-size:16px;border-radius:12px;border:2px solid #0d2438;background:#0d2438;color:#fff}
 .pay button.on{border-color:#1da1ff;background:#1da1ff;color:#fff}
 .add{width:100%;margin-top:16px;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#1da1ff;color:#fff}
 .mese{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -49,7 +49,7 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 </div>
 
 <script>
-var METODI=["Contanti","Carta","Altro"];
+var METODI=["POS","Uber","App/Voucher","Contanti"];
 var KEY="corse_taxi_v1";
 var metodo=METODI[0], vista=new Date(); vista.setDate(1);
 function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
