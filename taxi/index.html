@@ -44,11 +44,14 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 <div class="card">
   <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
   <div id="totali"></div>
-  <h3 style="margin:18px 0 0;font-size:15px;color:#9ca3af">Corse del mese</h3>
+  <div class="mese" style="margin-top:22px"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div>
+  <div class="row" style="border:0;color:#9ca3af;font-size:15px"><span id="gcount"></span><span id="gtot"></span></div>
   <div id="lista"></div>
 </div>
 
 <script>
+var giorno=new Date();
+function isoG(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 var METODI=["POS","Uber","App/Voucher","Contanti"];
 var KEY="corse_taxi_v1";
 var metodo=METODI[0], vista=new Date(); vista.setDate(1);
@@ -75,13 +78,19 @@ function disegna(){
   var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(tot[m])+'</span></div>'});
   h+='<div class="row tot"><span>Totale ('+corse.length+' corse)</span><span>'+euro(somma)+'</span></div>';
   document.getElementById("totali").innerHTML=h;
+  var gi=isoG(giorno),gc=tutte.filter(function(c){return c.data===gi}),gs=0;
+  gc.forEach(function(c){gs+=c.importo});
+  var oggi=isoG(new Date());
+  document.getElementById("gnome").textContent=(gi===oggi?"Oggi · ":"")+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});
+  document.getElementById("gcount").textContent=gc.length+(gc.length===1?" corsa":" corse");
+  document.getElementById("gtot").textContent=euro(gs);
   var l="";
-  corse.slice().reverse().forEach(function(c){
-    var g=c.data.slice(8,10)+"/"+c.data.slice(5,7);
-    l+='<div class="corsa"><div><b>'+euro(c.importo)+'</b> · '+esc(c.metodo)+'<small>'+g+(c.luogo?" · "+esc(c.luogo):"")+'</small></div><button data-id="'+c.id+'" aria-label="Elimina">✕</button></div>';
+  gc.slice().reverse().forEach(function(c){
+    var g="";
+    l+='<div class="corsa"><div><b>'+euro(c.importo)+'</b> · '+esc(c.metodo)+'<small>'+(c.luogo?esc(c.luogo):"—")+'</small></div><button data-id="'+c.id+'" aria-label="Elimina">✕</button></div>';
   });
   var le=document.getElementById("lista");
-  le.innerHTML=l||'<div class="vuoto">Nessuna corsa in questo mese</div>';
+  le.innerHTML=l||'<div class="vuoto">Nessuna corsa in questo giorno</div>';
   le.querySelectorAll("button").forEach(function(b){b.onclick=function(){
     if(confirm("Eliminare questa corsa?")){salva(carica().filter(function(c){return String(c.id)!==b.dataset.id}));disegna()}}});
 }
@@ -93,9 +102,14 @@ document.getElementById("add").onclick=function(){
   t.push({id:Date.now(),data:d,importo:imp,luogo:document.getElementById("luogo").value.trim(),metodo:metodo});
   salva(t);
   document.getElementById("importo").value="";document.getElementById("luogo").value="";
-  vista=new Date();vista.setDate(1);disegna();
+  giorno=new Date();vista=new Date();vista.setDate(1);disegna();
 };
-document.getElementById("prev").onclick=function(){vista.setMonth(vista.getMonth()-1);disegna()};
-document.getElementById("next").onclick=function(){vista.setMonth(vista.getMonth()+1);disegna()};
+function vaiMese(n){vista.setMonth(vista.getMonth()+n);var t=new Date();
+  giorno=(vista.getFullYear()===t.getFullYear()&&vista.getMonth()===t.getMonth())?t:new Date(vista.getFullYear(),vista.getMonth(),1);disegna()}
+function vaiGiorno(n){giorno=new Date(giorno.getFullYear(),giorno.getMonth(),giorno.getDate()+n);vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
+document.getElementById("prev").onclick=function(){vaiMese(-1)};
+document.getElementById("next").onclick=function(){vaiMese(1)};
+document.getElementById("gprev").onclick=function(){vaiGiorno(-1)};
+document.getElementById("gnext").onclick=function(){vaiGiorno(1)};
 disegnaPay();disegna();
 </script></body></html>
