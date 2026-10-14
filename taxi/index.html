@@ -84,6 +84,7 @@ function disegna(){
   document.getElementById("gnome").textContent=(gi===oggi?"Oggi · ":"")+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});
   document.getElementById("gcount").textContent=gc.length+(gc.length===1?" corsa":" corse");
   document.getElementById("gtot").textContent=euro(gs);
+  document.getElementById("add").textContent="+ Aggiungi corsa"+(gi===oggi?"":" · "+giorno.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"}));
   var l="";
   gc.slice().reverse().forEach(function(c){
     var g="";
@@ -97,12 +98,11 @@ function disegna(){
 document.getElementById("add").onclick=function(){
   var imp=parseFloat(document.getElementById("importo").value.replace(",","."));
   if(!(imp>0)){alert("Scrivi l'importo della corsa");return}
-  var n=new Date(),d=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
   var t=carica();
-  t.push({id:Date.now(),data:d,importo:imp,luogo:document.getElementById("luogo").value.trim(),metodo:metodo});
+  t.push({id:Date.now(),data:isoG(giorno),importo:imp,luogo:document.getElementById("luogo").value.trim(),metodo:metodo});
   salva(t);
   document.getElementById("importo").value="";document.getElementById("luogo").value="";
-  giorno=new Date();vista=new Date();vista.setDate(1);disegna();
+  disegna();
 };
 function vaiMese(n){vista.setMonth(vista.getMonth()+n);var t=new Date();
   giorno=(vista.getFullYear()===t.getFullYear()&&vista.getMonth()===t.getMonth())?t:new Date(vista.getFullYear(),vista.getMonth(),1);disegna()}
