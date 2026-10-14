@@ -46,10 +46,14 @@ input{width:100%;font-size:22px;padding:12px;border-radius:12px;border:0;backgro
 </div>
 
 <div class="card">
-  <div class="tabs"><button id="tG" class="on">Giornaliero</button><button id="tM">Mese</button></div>
+  <div class="tabs"><button id="tG" class="on">Giornaliero</button><button id="tM">Mese</button><button id="tA">Anno</button></div>
   <div id="vM" hidden>
     <div class="mese"><button id="prev">‹</button><b id="nome"></b><button id="next">›</button></div>
     <div id="totali"></div>
+  </div>
+  <div id="vA" hidden>
+    <div class="mese"><button id="aprev">‹</button><b id="anome"></b><button id="anext">›</button></div>
+    <div id="atotali"></div>
   </div>
   <div id="vG">
     <div class="mese"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div>
@@ -87,6 +91,11 @@ function disegna(){
   var h="";METODI.forEach(function(m){h+='<div class="row"><span>'+m+'</span><span>'+euro(tot[m])+'</span></div>'});
   h+='<div class="row tot"><span>Totale ('+corse.length+(corse.length===1?' corsa':' corse')+')</span><span>'+euro(somma)+'</span></div>';
   document.getElementById("totali").innerHTML=h;
+  var ay=String(giorno.getFullYear()),at={},asum=0,an=0;METODI.forEach(function(m){at[m]=0});
+  tutte.forEach(function(c){if(c.data.slice(0,4)===ay){at[c.metodo]=(at[c.metodo]||0)+c.importo;asum+=c.importo;an++}});
+  var ah="";METODI.forEach(function(m){ah+='<div class="row"><span>'+m+'</span><span>'+euro(at[m])+'</span></div>'});
+  ah+='<div class="row tot"><span>Totale ('+an+(an===1?' corsa':' corse')+')</span><span>'+euro(asum)+'</span></div>';
+  document.getElementById("anome").textContent=ay;document.getElementById("atotali").innerHTML=ah;
   var gi=isoG(giorno),gc=tutte.filter(function(c){return c.data===gi}),gs=0;
   gc.forEach(function(c){gs+=c.importo});
   var oggi=isoG(new Date());
@@ -119,14 +128,18 @@ function vaiMese(n){var t=new Date(),y=giorno.getFullYear(),m=giorno.getMonth()+
   if(n>0&&(y>t.getFullYear()||(y===t.getFullYear()&&giorno.getMonth()>=t.getMonth())))return;
   var ult=new Date(y,m+1,0).getDate(),d=new Date(y,m,Math.min(giorno.getDate(),ult));
   giorno=d>t?t:d;vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
+function vaiAnno(n){var t=new Date(),y=giorno.getFullYear()+n;
+  if(n>0&&y>t.getFullYear())return;
+  var ult=new Date(y,giorno.getMonth()+1,0).getDate(),d=new Date(y,giorno.getMonth(),Math.min(giorno.getDate(),ult));
+  giorno=d>t?t:d;vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
 function vaiGiorno(n){if(n>0&&isoG(giorno)>=isoG(new Date()))return;giorno=new Date(giorno.getFullYear(),giorno.getMonth(),giorno.getDate()+n);vista=new Date(giorno.getFullYear(),giorno.getMonth(),1);disegna()}
 document.getElementById("prev").onclick=function(){vaiMese(-1)};
 document.getElementById("next").onclick=function(){vaiMese(1)};
+document.getElementById("aprev").onclick=function(){vaiAnno(-1)};
+document.getElementById("anext").onclick=function(){vaiAnno(1)};
 document.getElementById("gprev").onclick=function(){vaiGiorno(-1)};
 document.getElementById("gnext").onclick=function(){vaiGiorno(1)};
-function tab(v){document.getElementById("vG").hidden=v!=="G";document.getElementById("vM").hidden=v!=="M";
-  document.getElementById("tG").className=v==="G"?"on":"";document.getElementById("tM").className=v==="M"?"on":""}
-document.getElementById("tG").onclick=function(){tab("G")};
-document.getElementById("tM").onclick=function(){tab("M")};
+function tab(v){["G","M","A"].forEach(function(k){document.getElementById("v"+k).hidden=v!==k;document.getElementById("t"+k).className=v===k?"on":""})}
+["G","M","A"].forEach(function(k){document.getElementById("t"+k).onclick=function(){tab(k)}});
 disegnaPay();disegna();tab("G");
 </script></body></html>
