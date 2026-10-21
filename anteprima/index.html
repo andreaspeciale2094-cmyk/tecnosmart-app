@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TecnoSmart Srl - Anteprima</title>
+<meta name="theme-color" content="#0a1a33">
+<link rel="icon" href="../icons/favicon-32.png" sizes="32x32">
+<style>
+  :root{--blu:#0b4a8f;--blu-scuro:#0a1a33;--grigio:#aab0b3;--testo:#e8eef7;--accento:#ff9800;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:var(--blu-scuro);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;}
+  #appFrame{position:fixed;inset:0;width:100%;height:100%;border:none;background:var(--blu-scuro);}
+  #splash{
+    position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;padding:24px;text-align:center;color:var(--testo);
+    background:radial-gradient(circle at 50% 30%,#12335f 0%,var(--blu-scuro) 70%);
+    transition:opacity .45s ease;
+  }
+  #splash.fade-out{opacity:0;pointer-events:none;}
+  .logo{
+    width:128px;height:128px;border-radius:50%;
+    box-shadow:0 0 0 6px rgba(255,255,255,.06),0 18px 50px rgba(0,0,0,.55);
+    animation:entra .7s ease both;
+  }
+  h1{margin:6px 0 0;font-size:24px;font-weight:800;letter-spacing:2px;animation:entra .7s .1s ease both;}
+  .sotto{margin:0;color:#8fa3c2;font-size:14px;letter-spacing:.5px;animation:entra .7s .2s ease both;}
+  .barra{width:180px;height:4px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:10px;}
+  .barra i{display:block;height:100%;width:40%;border-radius:4px;background:linear-gradient(90deg,var(--blu),var(--accento));animation:scorri 1.3s ease-in-out infinite;}
+  #fallback{display:none;font-size:14px;color:#8fa3c2;}
+  #fallback a{color:var(--accento);font-weight:700;text-decoration:none;}
+  .nota{position:fixed;top:10px;right:10px;background:var(--accento);color:#1a0f00;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:5;}
+  @keyframes entra{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+  @keyframes scorri{0%{transform:translateX(-100%);}100%{transform:translateX(350%);}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="nota">ANTEPRIMA</div>
+<iframe id="appFrame" title="App TecnoSmart"
+  src="https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec"
+  allow="clipboard-read; clipboard-write"></iframe>
+<div id="splash">
+  <img class="logo" src="../icons/icon-512.png" alt="Logo TecnoSmart">
+  <h1>TECNOSMART</h1>
+  <p class="sotto">RUN giornaliero e report dettagliato</p>
+  <div class="barra"><i></i></div>
+  <div id="fallback">Se non si apre, <a id="fallbackLink" target="_blank" rel="noopener" href="#">tocca qui</a>.</div>
+</div>
+<script>
+  var f=document.getElementById('appFrame'),s=document.getElementById('splash');
+  document.getElementById('fallbackLink').href=f.src;
+  f.addEventListener('load',function(){s.classList.add('fade-out');setTimeout(function(){s.style.display='none';},500);});
+  setTimeout(function(){document.getElementById('fallback').style.display='block';},4000);
+</script>
+</body>
+</html>
