@@ -64,6 +64,17 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
 .cli .ct b{display:block;font-size:16px}
 .cli .ct small{display:block;color:#94a3b8;overflow-wrap:anywhere}
 .cerca{margin:8px 0 12px}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.chips button{padding:12px 2px;font-size:14px;font-weight:600;border-radius:11px;border:2px solid #1a2942;background:#1a2942;color:#fff}
+.chips button.on{border-color:#2f7fe0;background:#2f7fe0}
+.rich em.pers{color:#c4b5fd}
+.pr{color:#c4b5fd!important;font-weight:600;margin-top:6px}
+.pr2{display:flex;gap:8px;margin-top:8px}
+.pr2 input{font-size:15px;padding:8px;flex:1;min-width:0}
+.mini{border:0;border-radius:9px;background:#1a2942;color:#fff;font-size:14px;font-weight:600;padding:8px 10px;margin-left:6px}
+.pick{position:relative;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:#1a2942}
+.pick::after{content:"▾";color:#4da3ff;font-size:14px}
+.pick input,.pick select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:pointer;border:0;padding:0;background:none}
 .ver{text-align:center;color:#3b4a5e;font-size:12px;margin:0 0 20px}
 </style></head><body>
 <div class="head"><div class="logo"><img src="logo.png" alt="TecnoSmart"></div><h1>TecnoSmart<small>Business Promoter</small></h1></div>
@@ -79,19 +90,22 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
   <div class="esiti" id="tipi"></div>
   <label>Nota (facoltativa)</label>
   <input id="nota" type="text" placeholder="Es. cliente già contattato" style="font-size:18px" autocomplete="off">
+  <label>⏰ Promemoria per richiamarlo (facoltativo)</label>
+  <div class="chips" id="chips"><button data-n="0" class="on">Nessuno</button><button data-n="7">7 giorni</button><button data-n="15">15 giorni</button><button data-n="30">30 giorni</button></div>
+  <input id="promdata" type="date" style="font-size:18px;margin-top:8px">
   <button class="add" id="add">+ Aggiungi contratto</button>
 </div>
 
 <div class="card">
   <div class="tabs"><button id="tG" class="on">Giornaliero</button><button id="tM">Mese</button><button id="tA">Anno</button></div>
-  <div id="vG"><div class="nav"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div><div id="gtot"></div><div id="lista"></div></div>
-  <div id="vM" hidden><div class="nav"><button id="mprev">‹</button><b id="mnome"></b><button id="mnext">›</button></div><div id="mtot"></div><div id="mcon"></div></div>
-  <div id="vA" hidden><div class="nav"><button id="aprev">‹</button><b id="anome"></b><button id="anext">›</button></div><div id="atot"></div><div id="acon"></div></div>
+  <div id="vG"><div class="nav"><button id="gprev">‹</button><span class="pick"><b id="gnome"></b><input type="date" id="gpick" aria-label="Scegli il giorno"></span><button id="gnext">›</button></div><div id="gtot"></div><div id="lista"></div></div>
+  <div id="vM" hidden><div class="nav"><button id="mprev">‹</button><span class="pick"><b id="mnome"></b><input type="month" id="mpick" aria-label="Scegli il mese"></span><button id="mnext">›</button></div><div id="mtot"></div><div id="mcon"></div></div>
+  <div id="vA" hidden><div class="nav"><button id="aprev">‹</button><span class="pick"><b id="anome"></b><select id="apick" aria-label="Scegli l'anno"></select></span><button id="anext">›</button></div><div id="atot"></div><div id="acon"></div></div>
 </div>
 <div class="ov" id="ov" hidden><div class="box"><h2>🔔 Clienti da richiamare</h2><p>È passato il periodo dal contratto. Chiamali per proporre un rinnovo o una nuova offerta.</p><div id="ovl"></div><button class="chiudi" id="chiudi">Chiudi</button></div></div>
 <div class="ov" id="ana" hidden><div class="box"><h2>📇 Anagrafiche</h2><p>Tocca un cliente per vedere cosa ha firmato e quando.</p>
 <input id="cerca" class="cerca" type="search" placeholder="Cerca azienda..." autocomplete="off"><div id="anal"></div><button class="chiudi" id="chiudiAna">Chiudi</button></div></div>
-<p class="ver">Versione 3 · anagrafiche</p>
+<p class="ver">Versione 5 · cambio data</p>
 
 <script>
 var TIPI=["FISSO + SECONDA LINEA","MOBILE/DATA","MOBILE + TEL","LUCE E GAS"];
@@ -103,26 +117,43 @@ var MESI={"FISSO + SECONDA LINEA":6,"LUCE E GAS":6,"MOBILE/DATA":24,"MOBILE + TE
 function addMesi(d,n){var y=+d.slice(0,4),m=+d.slice(5,7)-1+n,g=+d.slice(8,10),ult=new Date(y,m+1,0).getDate();return iso(new Date(y,m,Math.min(g,ult)))}
 function richiamo(x){return addMesi(x.data,MESI[x.tipo]||6)}
 function giorniTra(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)}
-function dovuti(){var o=oggi();return carica().filter(function(x){return !x.fatto&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o)}).sort(function(a,b){return richiamo(a)<richiamo(b)?-1:1})}
+function dovuti(){var o=oggi(),r=[];
+  carica().forEach(function(x){
+    if(x.prom&&!x.promFatto&&x.prom<=o&&!(x.promRimanda&&x.promRimanda>o))r.push({x:x,k:"p",d:x.prom});
+    if(!x.fatto&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o))r.push({x:x,k:"a",d:richiamo(x)})});
+  return r.sort(function(a,b){return a.d<b.d?-1:1})}
 function aggiorna(id,mod){var t=carica();t.forEach(function(x){if(String(x.id)===String(id))mod(x)});salva(t);disegna();apriAvviso(true)}
-function apriAvviso(soloSeCe){var d=dovuti(),ov=document.getElementById("ov");
+function tra(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+function apriAvviso(){var d=dovuti(),ov=document.getElementById("ov");
   if(!d.length){ov.hidden=true;return}
-  var h="",o=oggi();d.forEach(function(x){var r=richiamo(x),gg=giorniTra(r,o);
-    h+='<div class="rich"><b>'+esc(x.azienda)+'</b><small>'+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+'<br>Contratto del '+fd(x.data)+"/"+x.data.slice(2,4)+' · <em>'+(gg<=0?"da richiamare oggi":"scaduto da "+gg+(gg===1?" giorno":" giorni"))+'</em></small><div class="az"><button class="ok" data-a="f" data-id="'+x.id+'">✓ Fatto</button><button class="rim" data-a="r" data-id="'+x.id+'">Rimanda 7 giorni</button></div></div>'});
+  var h="",o=oggi();d.forEach(function(it){var x=it.x,gg=giorniTra(it.d,o),pers=it.k==="p";
+    h+='<div class="rich"><b>'+esc(x.azienda)+'</b><small>'+(pers?'<em class="pers">⏰ Promemoria personale</em><br>':'')+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?'<br>Nota: '+esc(x.nota):'')+'<br>'+(pers?'Promemoria impostato per il '+fdl(it.d):'Contratto del '+fd(x.data)+"/"+x.data.slice(2,4))+' · <em>'+(gg<=0?"da richiamare oggi":"scaduto da "+gg+(gg===1?" giorno":" giorni"))+'</em></small><div class="az"><button class="ok" data-a="f" data-k="'+it.k+'" data-id="'+x.id+'">✓ Fatto</button><button class="rim" data-a="r" data-k="'+it.k+'" data-id="'+x.id+'">Rimanda 7 giorni</button></div></div>'});
   document.getElementById("ovl").innerHTML=h;ov.hidden=false;
   document.getElementById("ovl").querySelectorAll("button").forEach(function(b){b.onclick=function(){
-    if(b.dataset.a==="f")aggiorna(b.dataset.id,function(x){x.fatto=oggi()});
-    else{var d7=new Date();d7.setDate(d7.getDate()+7);aggiorna(b.dataset.id,function(x){x.rimanda=iso(d7)})}}})}
+    var p=b.dataset.k==="p";
+    if(b.dataset.a==="f")aggiorna(b.dataset.id,function(x){if(p)x.promFatto=oggi();else x.fatto=oggi()});
+    else{var d7=tra(7);aggiorna(b.dataset.id,function(x){if(p)x.promRimanda=d7;else x.rimanda=d7})}}})}
 function fdl(s){return s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4)}
 function chiaveCli(n){return n.trim().toLowerCase().replace(/\s+/g," ")}
 function clienti(){var m={};carica().forEach(function(x){var k=chiaveCli(x.azienda);if(!m[k])m[k]={nome:x.azienda.trim(),c:[]};m[k].c.push(x)});
   return Object.keys(m).map(function(k){m[k].c.sort(function(a,b){return a.data<b.data?1:-1});return m[k]}).sort(function(a,b){return a.nome.toLowerCase()<b.nome.toLowerCase()?-1:1})}
+function promBox(x){
+  if(x.prom&&!x.promFatto)return '<small class="pr">⏰ Promemoria il '+fdl(x.prom)+' <button class="mini" data-pa="t" data-id="'+x.id+'">Togli</button></small>';
+  return '<div class="pr2"><input type="date" min="'+oggi()+'" data-pd="'+x.id+'"><button class="mini" data-pa="s" data-id="'+x.id+'">⏰ Imposta promemoria</button></div>'}
 function disegnaAna(){var q=chiaveCli(document.getElementById("cerca").value),l=clienti(),h="",n=0;
   l.forEach(function(c){if(q&&chiaveCli(c.nome).indexOf(q)<0)return;n++;
     h+='<details class="cli"><summary><span>'+esc(c.nome)+'</span><i>'+c.c.length+(c.c.length===1?" contratto":" contratti")+'</i></summary><div class="ct">';
-    c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small></div>'});
+    c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small>'+promBox(x)+'</div>'});
     h+='</div></details>'});
-  document.getElementById("anal").innerHTML=h||'<div class="vuoto">'+(q?"Nessun cliente trovato":"Ancora nessun cliente")+'</div>'}
+  var al=document.getElementById("anal");al.innerHTML=h||'<div class="vuoto">'+(q?"Nessun cliente trovato":"Ancora nessun cliente")+'</div>';
+  al.querySelectorAll("[data-pa]").forEach(function(b){b.onclick=function(e){e.preventDefault();e.stopPropagation();var id=b.dataset.id;
+    if(b.dataset.pa==="t"){aggiorna2(id,function(x){x.prom="";x.promFatto=""})}
+    else{var v=al.querySelector('[data-pd="'+id+'"]').value;if(!v||v<oggi()){alert("Scegli una data da oggi in poi");return}aggiorna2(id,function(x){x.prom=v;x.promFatto="";x.promRimanda=""})}}});
+  al.querySelectorAll("input[data-pd]").forEach(function(i){i.onclick=function(e){e.stopPropagation()}})}
+function aggiorna2(id,mod){var ap=[];document.querySelectorAll("#anal details[open] summary span").forEach(function(e){ap.push(e.textContent)});
+  var t=carica();t.forEach(function(x){if(String(x.id)===String(id))mod(x)});salva(t);disegna();disegnaAna();
+  document.querySelectorAll("#anal details").forEach(function(d){if(ap.indexOf(d.querySelector("summary span").textContent)>=0)d.open=true});
+  if(!document.getElementById("ov").hidden||dovuti().length)apriAvviso()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function fd(s){return s.slice(8,10)+"/"+s.slice(5,7)}
@@ -133,7 +164,7 @@ function righe(v){
   var h="";TIPI.forEach(function(e){h+='<div class="row"><span>'+e+'</span><span>'+c[e]+'</span></div>'});
   return h+'<div class="row tot"><span>Totale contratti</span><span>'+v.length+'</span></div>'}
 function voce(x,conData,conX){
-  return '<div class="voce"><div><b>'+esc(x.azienda)+'</b><small>'+(conData?fd(x.data)+" · ":"")+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?" · "+esc(x.nota):"")+'<br>Richiamo dal '+fd(richiamo(x))+"/"+richiamo(x).slice(2,4)+(x.fatto?" · fatto":"")+'</small></div>'+(conX?'<button data-id="'+x.id+'" aria-label="Elimina">✕</button>':'')+'</div>'}
+  return '<div class="voce"><div><b>'+esc(x.azienda)+'</b><small>'+(conData?fd(x.data)+" · ":"")+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?" · "+esc(x.nota):"")+'<br>Richiamo dal '+fd(richiamo(x))+"/"+richiamo(x).slice(2,4)+(x.fatto?" · fatto":"")+(x.prom&&!x.promFatto?'<br>⏰ Promemoria il '+fdl(x.prom):'')+'</small></div>'+(conX?'<button data-id="'+x.id+'" aria-label="Elimina">✕</button>':'')+'</div>'}
 function elenco(v){
   if(!v.length)return"";
   var h='<h3>Elenco contratti</h3>';v.slice().reverse().forEach(function(x){h+=voce(x,true,false)});return h}
@@ -156,14 +187,19 @@ function disegna(){
   document.getElementById("anome").textContent=y;
   document.getElementById("atot").innerHTML=righe(av);document.getElementById("acon").innerHTML=elenco(av);
   var ncl=clienti().length;document.getElementById("nAna").textContent=ncl?"("+ncl+(ncl===1?" cliente":" clienti")+")":"";
+  var gp=document.getElementById("gpick");gp.value=g;gp.max=oggi();
+  var mp=document.getElementById("mpick");mp.value=m;mp.max=oggi().slice(0,7);
+  var ap=document.getElementById("apick"),cy=new Date().getFullYear(),miny=cy-3;t.forEach(function(x){var yy=+x.data.slice(0,4);if(yy<miny)miny=yy});
+  var oh="";for(var yy=cy;yy>=miny;yy--)oh+='<option value="'+yy+'"'+(String(yy)===y?' selected':'')+'>'+yy+'</option>';ap.innerHTML=oh;
   var nd=dovuti().length,bd=document.getElementById("badge");bd.hidden=!nd;bd.textContent="🔔 "+nd+(nd===1?" cliente da richiamare":" clienti da richiamare");
   document.getElementById("add").textContent="+ Aggiungi contratto"+(g===oggi()?"":" · "+nomeG(giorno));
 }
 document.getElementById("add").onclick=function(){
   var a=document.getElementById("azienda").value.trim();
   if(!a){alert("Scrivi la denominazione dell'azienda");return}
-  var t=carica();t.push({id:Date.now(),data:iso(giorno),azienda:a,sede:document.getElementById("sede").value.trim(),tipo:tipo,nota:document.getElementById("nota").value.trim()});
-  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";disegna()};
+  var pd=document.getElementById("promdata").value;if(pd&&pd<oggi()){alert("La data del promemoria deve essere da oggi in poi");return}
+  var t=carica();t.push({id:Date.now(),data:iso(giorno),azienda:a,prom:document.getElementById("promdata").value||"",sede:document.getElementById("sede").value.trim(),tipo:tipo,nota:document.getElementById("nota").value.trim()});
+  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";document.getElementById("promdata").value="";segnaChip(0);disegna()};
 function sposta(dy,dm,dd){var t=new Date(),y=giorno.getFullYear()+dy,m=giorno.getMonth()+dm,d=giorno.getDate()+dd;
   var ult=new Date(y,m+1,0).getDate(),n=new Date(y,m,dd?d:Math.min(giorno.getDate(),ult));
   if(n>t){if(dy>0||dm>0||dd>0)return;n=t}
@@ -176,6 +212,14 @@ function tab(v){["G","M","A"].forEach(function(k){document.getElementById("v"+k)
 document.getElementById("btnAna").onclick=function(){document.getElementById("cerca").value="";disegnaAna();document.getElementById("ana").hidden=false;window.scrollTo(0,0)};
 document.getElementById("cerca").oninput=disegnaAna;
 document.getElementById("chiudiAna").onclick=function(){document.getElementById("ana").hidden=true};
+function segnaChip(n){document.querySelectorAll("#chips button").forEach(function(b){b.className=(+b.dataset.n===n)?"on":""})}
+document.querySelectorAll("#chips button").forEach(function(b){b.onclick=function(){var n=+b.dataset.n;segnaChip(n);document.getElementById("promdata").value=n?tra(n):""}});
+document.getElementById("promdata").min=oggi();
+document.getElementById("promdata").onchange=function(){segnaChip(-1)};
+function vaiA(y,m,dd){var t=new Date(),ult=new Date(y,m+1,0).getDate(),n=new Date(y,m,Math.min(dd,ult));if(n>t)n=t;giorno=n;disegna()}
+document.getElementById("gpick").onchange=function(){var v=this.value;if(!v)return;vaiA(+v.slice(0,4),+v.slice(5,7)-1,+v.slice(8,10))};
+document.getElementById("mpick").onchange=function(){var v=this.value;if(!v)return;vaiA(+v.slice(0,4),+v.slice(5,7)-1,giorno.getDate())};
+document.getElementById("apick").onchange=function(){vaiA(+this.value,giorno.getMonth(),giorno.getDate())};
 document.getElementById("badge").onclick=function(){apriAvviso()};
 document.getElementById("chiudi").onclick=function(){document.getElementById("ov").hidden=true};
 disegnaTipi();disegna();tab("G");apriAvviso();
