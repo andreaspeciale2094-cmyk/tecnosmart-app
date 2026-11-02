@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Promoter">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<title>TecnoSmart Promoter</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#0b1220;color:#f1f5f9;padding:16px;max-width:480px;margin:auto;overflow-x:hidden;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+.head{display:flex;flex-direction:column;align-items:center;gap:8px;margin:4px 0 18px;text-align:center}
+.logo{width:150px;height:150px;border-radius:50%;overflow:hidden;box-shadow:0 0 28px #2f7fe055}
+.logo img{width:100%;height:100%;object-fit:cover}
+h1{font-size:24px;margin:0;letter-spacing:.5px}
+h1 small{display:block;font-size:14px;font-weight:400;color:#4da3ff;margin-top:2px}
+.card{background:#111b2e;border:1px solid #1e2d49;border-radius:16px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:14px;color:#94a3b8;margin:12px 0 4px}
+label:first-child{margin-top:0}
+input{width:100%;font-size:20px;padding:12px;border-radius:12px;border:0;background:#1a2942;color:#fff}
+.esiti{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.esiti button{padding:16px 6px;font-size:15px;font-weight:600;border-radius:12px;border:2px solid #1a2942;background:#1a2942;color:#fff}
+.esiti button.on{border-color:#2f7fe0;background:#2f7fe0}
+.add{width:100%;margin-top:16px;padding:16px;font-size:19px;font-weight:700;border:0;border-radius:14px;background:#2f7fe0;color:#fff}
+.tabs{display:flex;gap:6px;background:#0b1220;border-radius:14px;padding:4px;margin-bottom:14px}
+.tabs button{flex:1;padding:12px 4px;font-size:16px;font-weight:600;border:0;border-radius:11px;background:none;color:#94a3b8}
+.tabs button.on{background:#2f7fe0;color:#fff}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.nav button{font-size:22px;background:#1a2942;color:#fff;border:0;border-radius:10px;padding:6px 14px}
+.nav b{text-transform:capitalize}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #1e2d49;font-size:18px}
+.row.tot{font-size:19px;font-weight:700;border:0}
+.row.contr{color:#4ade80;font-weight:700}
+h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
+.voce{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e2d49}
+.voce div{min-width:0}
+.voce b{display:block;overflow-wrap:anywhere}
+.voce small{color:#94a3b8;display:block;overflow-wrap:anywhere}
+.voce button{background:none;border:0;color:#f87171;font-size:22px}
+.vuoto{color:#94a3b8;text-align:center;padding:10px}
+.badge{display:block;width:100%;margin:0 0 16px;padding:14px;font-size:17px;font-weight:700;border:0;border-radius:14px;background:#f59e0b;color:#1a1100}
+.ov{position:fixed;inset:0;background:#000c;z-index:10;overflow-y:auto;padding:16px}
+.ov .box{max-width:480px;margin:0 auto;background:#111b2e;border:1px solid #2f7fe0;border-radius:18px;padding:16px}
+.ov h2{margin:0 0 4px;font-size:20px}
+.ov p{margin:0 0 12px;color:#94a3b8;font-size:14px}
+.rich{padding:12px 0;border-top:1px solid #1e2d49}
+.rich b{display:block;font-size:18px;overflow-wrap:anywhere}
+.rich small{display:block;color:#94a3b8;margin:2px 0 8px;overflow-wrap:anywhere}
+.rich small em{color:#fbbf24;font-style:normal;font-weight:600}
+.rich .az{display:flex;gap:8px}
+.rich .az button{flex:1;padding:12px 4px;font-size:16px;font-weight:600;border:0;border-radius:11px;color:#fff}
+.rich .ok{background:#16a34a}.rich .rim{background:#1a2942}
+.chiudi{width:100%;margin-top:12px;padding:14px;font-size:17px;font-weight:700;border:0;border-radius:12px;background:#2f7fe0;color:#fff}
+.btnana{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:0 0 16px;padding:16px;font-size:18px;font-weight:700;border:2px solid #2f7fe0;border-radius:14px;background:#111b2e;color:#fff}
+.btnana small{font-weight:400;color:#94a3b8;font-size:14px}
+.cli{border-top:1px solid #1e2d49}
+.cli summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;font-size:18px;font-weight:600;cursor:pointer}
+.cli summary::-webkit-details-marker{display:none}
+.cli summary span{overflow-wrap:anywhere}
+.cli summary i{font-style:normal;font-size:13px;font-weight:600;background:#2f7fe0;border-radius:99px;padding:3px 10px;flex:none}
+.cli .ct{padding:0 0 10px 12px;border-left:3px solid #2f7fe0;margin:0 0 12px 4px}
+.cli .ct div{padding:8px 0 8px 10px}
+.cli .ct b{display:block;font-size:16px}
+.cli .ct small{display:block;color:#94a3b8;overflow-wrap:anywhere}
+.cerca{margin:8px 0 12px}
+.ver{text-align:center;color:#3b4a5e;font-size:12px;margin:0 0 20px}
+</style></head><body>
+<div class="head"><div class="logo"><img src="logo.png" alt="TecnoSmart"></div><h1>TecnoSmart<small>Business Promoter</small></h1></div>
+
+<button class="btnana" id="btnAna">📇 Anagrafiche <small id="nAna"></small></button>
+<button class="badge" id="badge" hidden></button>
+<div class="card">
+  <label>Denominazione azienda</label>
+  <input id="azienda" type="text" placeholder="Es. Rossi Srl" autocomplete="off">
+  <label>Sede di attivazione</label>
+  <input id="sede" type="text" placeholder="Es. Via Roma 12, Milano" style="font-size:18px" autocomplete="off">
+  <label>Tipo di contratto</label>
+  <div class="esiti" id="tipi"></div>
+  <label>Nota (facoltativa)</label>
+  <input id="nota" type="text" placeholder="Es. cliente già contattato" style="font-size:18px" autocomplete="off">
+  <button class="add" id="add">+ Aggiungi contratto</button>
+</div>
+
+<div class="card">
+  <div class="tabs"><button id="tG" class="on">Giornaliero</button><button id="tM">Mese</button><button id="tA">Anno</button></div>
+  <div id="vG"><div class="nav"><button id="gprev">‹</button><b id="gnome"></b><button id="gnext">›</button></div><div id="gtot"></div><div id="lista"></div></div>
+  <div id="vM" hidden><div class="nav"><button id="mprev">‹</button><b id="mnome"></b><button id="mnext">›</button></div><div id="mtot"></div><div id="mcon"></div></div>
+  <div id="vA" hidden><div class="nav"><button id="aprev">‹</button><b id="anome"></b><button id="anext">›</button></div><div id="atot"></div><div id="acon"></div></div>
+</div>
+<div class="ov" id="ov" hidden><div class="box"><h2>🔔 Clienti da richiamare</h2><p>È passato il periodo dal contratto. Chiamali per proporre un rinnovo o una nuova offerta.</p><div id="ovl"></div><button class="chiudi" id="chiudi">Chiudi</button></div></div>
+<div class="ov" id="ana" hidden><div class="box"><h2>📇 Anagrafiche</h2><p>Tocca un cliente per vedere cosa ha firmato e quando.</p>
+<input id="cerca" class="cerca" type="search" placeholder="Cerca azienda..." autocomplete="off"><div id="anal"></div><button class="chiudi" id="chiudiAna">Chiudi</button></div></div>
+<p class="ver">Versione 3 · anagrafiche</p>
+
+<script>
+var TIPI=["FISSO + SECONDA LINEA","MOBILE/DATA","MOBILE + TEL","LUCE E GAS"];
+var KEY="tecnosmart_promoter_v1";
+var tipo=TIPI[0],giorno=new Date();
+function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert("Impossibile salvare su questo telefono")}}
+var MESI={"FISSO + SECONDA LINEA":6,"LUCE E GAS":6,"MOBILE/DATA":24,"MOBILE + TEL":36};
+function addMesi(d,n){var y=+d.slice(0,4),m=+d.slice(5,7)-1+n,g=+d.slice(8,10),ult=new Date(y,m+1,0).getDate();return iso(new Date(y,m,Math.min(g,ult)))}
+function richiamo(x){return addMesi(x.data,MESI[x.tipo]||6)}
+function giorniTra(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)}
+function dovuti(){var o=oggi();return carica().filter(function(x){return !x.fatto&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o)}).sort(function(a,b){return richiamo(a)<richiamo(b)?-1:1})}
+function aggiorna(id,mod){var t=carica();t.forEach(function(x){if(String(x.id)===String(id))mod(x)});salva(t);disegna();apriAvviso(true)}
+function apriAvviso(soloSeCe){var d=dovuti(),ov=document.getElementById("ov");
+  if(!d.length){ov.hidden=true;return}
+  var h="",o=oggi();d.forEach(function(x){var r=richiamo(x),gg=giorniTra(r,o);
+    h+='<div class="rich"><b>'+esc(x.azienda)+'</b><small>'+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+'<br>Contratto del '+fd(x.data)+"/"+x.data.slice(2,4)+' · <em>'+(gg<=0?"da richiamare oggi":"scaduto da "+gg+(gg===1?" giorno":" giorni"))+'</em></small><div class="az"><button class="ok" data-a="f" data-id="'+x.id+'">✓ Fatto</button><button class="rim" data-a="r" data-id="'+x.id+'">Rimanda 7 giorni</button></div></div>'});
+  document.getElementById("ovl").innerHTML=h;ov.hidden=false;
+  document.getElementById("ovl").querySelectorAll("button").forEach(function(b){b.onclick=function(){
+    if(b.dataset.a==="f")aggiorna(b.dataset.id,function(x){x.fatto=oggi()});
+    else{var d7=new Date();d7.setDate(d7.getDate()+7);aggiorna(b.dataset.id,function(x){x.rimanda=iso(d7)})}}})}
+function fdl(s){return s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4)}
+function chiaveCli(n){return n.trim().toLowerCase().replace(/\s+/g," ")}
+function clienti(){var m={};carica().forEach(function(x){var k=chiaveCli(x.azienda);if(!m[k])m[k]={nome:x.azienda.trim(),c:[]};m[k].c.push(x)});
+  return Object.keys(m).map(function(k){m[k].c.sort(function(a,b){return a.data<b.data?1:-1});return m[k]}).sort(function(a,b){return a.nome.toLowerCase()<b.nome.toLowerCase()?-1:1})}
+function disegnaAna(){var q=chiaveCli(document.getElementById("cerca").value),l=clienti(),h="",n=0;
+  l.forEach(function(c){if(q&&chiaveCli(c.nome).indexOf(q)<0)return;n++;
+    h+='<details class="cli"><summary><span>'+esc(c.nome)+'</span><i>'+c.c.length+(c.c.length===1?" contratto":" contratti")+'</i></summary><div class="ct">';
+    c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small></div>'});
+    h+='</div></details>'});
+  document.getElementById("anal").innerHTML=h||'<div class="vuoto">'+(q?"Nessun cliente trovato":"Ancora nessun cliente")+'</div>'}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fd(s){return s.slice(8,10)+"/"+s.slice(5,7)}
+function oggi(){return iso(new Date())}
+function nomeG(d){return d.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"})}
+function righe(v){
+  var c={};TIPI.forEach(function(e){c[e]=0});v.forEach(function(x){c[x.tipo]=(c[x.tipo]||0)+1});
+  var h="";TIPI.forEach(function(e){h+='<div class="row"><span>'+e+'</span><span>'+c[e]+'</span></div>'});
+  return h+'<div class="row tot"><span>Totale contratti</span><span>'+v.length+'</span></div>'}
+function voce(x,conData,conX){
+  return '<div class="voce"><div><b>'+esc(x.azienda)+'</b><small>'+(conData?fd(x.data)+" · ":"")+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?" · "+esc(x.nota):"")+'<br>Richiamo dal '+fd(richiamo(x))+"/"+richiamo(x).slice(2,4)+(x.fatto?" · fatto":"")+'</small></div>'+(conX?'<button data-id="'+x.id+'" aria-label="Elimina">✕</button>':'')+'</div>'}
+function elenco(v){
+  if(!v.length)return"";
+  var h='<h3>Elenco contratti</h3>';v.slice().reverse().forEach(function(x){h+=voce(x,true,false)});return h}
+function disegnaTipi(){
+  var el=document.getElementById("tipi");el.innerHTML="";
+  TIPI.forEach(function(e){var b=document.createElement("button");b.textContent=e;
+    if(e===tipo)b.className="on";
+    b.onclick=function(){tipo=e;disegnaTipi()};el.appendChild(b)})}
+function disegna(){
+  var t=carica(),g=iso(giorno),y=g.slice(0,4),m=g.slice(0,7);
+  var dv=t.filter(function(x){return x.data===g}),mv=t.filter(function(x){return x.data.slice(0,7)===m}),av=t.filter(function(x){return x.data.slice(0,4)===y});
+  document.getElementById("gnome").textContent=(g===oggi()?"Oggi · ":"")+nomeG(giorno);
+  document.getElementById("gtot").innerHTML=righe(dv);
+  var l="";dv.slice().reverse().forEach(function(x){l+=voce(x,false,true)});
+  var le=document.getElementById("lista");le.innerHTML=l?'<h3>Contratti del giorno</h3>'+l:'<div class="vuoto">Nessun contratto in questo giorno</div>';
+  le.querySelectorAll("button").forEach(function(b){b.onclick=function(){
+    if(confirm("Eliminare questo contratto?")){salva(carica().filter(function(x){return String(x.id)!==b.dataset.id}));disegna()}}});
+  document.getElementById("mnome").textContent=giorno.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
+  document.getElementById("mtot").innerHTML=righe(mv);document.getElementById("mcon").innerHTML=elenco(mv);
+  document.getElementById("anome").textContent=y;
+  document.getElementById("atot").innerHTML=righe(av);document.getElementById("acon").innerHTML=elenco(av);
+  var ncl=clienti().length;document.getElementById("nAna").textContent=ncl?"("+ncl+(ncl===1?" cliente":" clienti")+")":"";
+  var nd=dovuti().length,bd=document.getElementById("badge");bd.hidden=!nd;bd.textContent="🔔 "+nd+(nd===1?" cliente da richiamare":" clienti da richiamare");
+  document.getElementById("add").textContent="+ Aggiungi contratto"+(g===oggi()?"":" · "+nomeG(giorno));
+}
+document.getElementById("add").onclick=function(){
+  var a=document.getElementById("azienda").value.trim();
+  if(!a){alert("Scrivi la denominazione dell'azienda");return}
+  var t=carica();t.push({id:Date.now(),data:iso(giorno),azienda:a,sede:document.getElementById("sede").value.trim(),tipo:tipo,nota:document.getElementById("nota").value.trim()});
+  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";disegna()};
+function sposta(dy,dm,dd){var t=new Date(),y=giorno.getFullYear()+dy,m=giorno.getMonth()+dm,d=giorno.getDate()+dd;
+  var ult=new Date(y,m+1,0).getDate(),n=new Date(y,m,dd?d:Math.min(giorno.getDate(),ult));
+  if(n>t){if(dy>0||dm>0||dd>0)return;n=t}
+  giorno=n;disegna()}
+document.getElementById("gprev").onclick=function(){sposta(0,0,-1)};document.getElementById("gnext").onclick=function(){sposta(0,0,1)};
+document.getElementById("mprev").onclick=function(){sposta(0,-1,0)};document.getElementById("mnext").onclick=function(){sposta(0,1,0)};
+document.getElementById("aprev").onclick=function(){sposta(-1,0,0)};document.getElementById("anext").onclick=function(){sposta(1,0,0)};
+function tab(v){["G","M","A"].forEach(function(k){document.getElementById("v"+k).hidden=v!==k;document.getElementById("t"+k).className=v===k?"on":""})}
+["G","M","A"].forEach(function(k){document.getElementById("t"+k).onclick=function(){tab(k)}});
+document.getElementById("btnAna").onclick=function(){document.getElementById("cerca").value="";disegnaAna();document.getElementById("ana").hidden=false;window.scrollTo(0,0)};
+document.getElementById("cerca").oninput=disegnaAna;
+document.getElementById("chiudiAna").onclick=function(){document.getElementById("ana").hidden=true};
+document.getElementById("badge").onclick=function(){apriAvviso()};
+document.getElementById("chiudi").onclick=function(){document.getElementById("ov").hidden=true};
+disegnaTipi();disegna();tab("G");apriAvviso();
+</script></body></html>
