@@ -174,14 +174,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div id="sitWrap">
         <span class="lbl" id="lblSit">Situazione con WindTre</span>
         <div class="seg" role="radiogroup" aria-labelledby="lblSit">
-          <label><input type="radio" name="sit" value="new" checked><span>Nuovo cliente energia</span></label>
-          <label><input type="radio" name="sit" value="cb"><span>Già cliente WindTre</span></label>
+          <label><input type="radio" name="sit" value="new" checked><span>Nuovo cliente</span></label>
+          <label><input type="radio" name="sit" value="tel"><span>Già cliente telco</span></label>
+          <label><input type="radio" name="sit" value="cb"><span>Già cliente telco ed energy</span></label>
         </div>
       </div>
-      <div class="check" id="telcoWrap">
-        <input type="checkbox" id="telco" checked>
-        <label for="telco" id="telcoLb">Ha mobile, fisso o assicurazioni WindTre (anche attivati insieme)</label>
-      </div>
+      <!-- la situazione con WindTre decide l'offerta: nessun altro flag -->
+
       <div class="check">
         <input type="checkbox" id="tut">
         <label for="tut">È ancora in tutele graduali</label>
@@ -374,13 +373,13 @@ function expired(o){return !!o.fino&&todayStr()>o.fino}
 function cfg(){
   var cl=document.querySelector('input[name="cliente"]:checked').value;
   var st=document.querySelector('input[name="sit"]:checked').value;
-  return {cliente:cl,sit:cl==="biz"?"new":st,telco:$("telco").checked,tut:$("tut").checked,
+  return {cliente:cl,sit:cl==="biz"?"new":st,tut:$("tut").checked,
     pun:num($("p_pun").value),psv:num($("p_psv").value),f1:num($("p_f1").value),f2:num($("p_f2").value),f3:num($("p_f3").value),perd:num($("p_perd").value),disp:num($("p_disp").value)};
 }
 function pick(c){
   if(c.cliente==="biz")return {o:L.off.micro};
   if(c.sit==="cb")return {o:L.off.spt};
-  if(c.telco)return {o:L.off.sp50};
+  if(c.sit==="tel")return {o:L.off.sp50};
   return {o:L.off.ns};
 }
 function readSvc(p){
@@ -433,6 +432,10 @@ function renderOffer(c){
       '<div class="chips">'+o.proc.map(function(x){return '<span class="tag">'+esc(x)+'</span>'}).join("")+'</div>'+
       '<p class="note">Canali: '+esc(o.canali)+'. Luce e gas si possono attivare insieme o separati.</p></div>';
   }
+  if(pk.o&&c.cliente==="dom"&&c.sit==="new"){
+    var o2=L.off.sp50;
+    h+='<div class="offerbox"><div class="svc-h"><h3>Se attiva anche mobile, fisso o assicurazioni WindTre: '+esc(o2.nome)+'</h3>'+(expired(o2)?'<span class="tag no">Scaduta il '+itDate(o2.fino)+'</span>':'<span class="tag ex">Valida fino al '+itDate(o2.fino)+'</span>')+'</div><p class="note">Luce: PUN + '+n3(o2.luce.spread,4)+' €/kWh, fisso '+eur(o2.luce.fisso)+'/anno. Gas: PSV + '+n3(o2.gas.spread,4)+' €/Smc, fisso '+eur(o2.gas.fisso)+'/anno.</p></div>';
+  }
   $("offerBox").innerHTML=h;
 }
 
@@ -461,8 +464,7 @@ function svcCard(titolo,o,sv,sav,oggi){
 function calc(){
   var c=cfg(),R=$("results");
   $("sitWrap").hidden=c.cliente==="biz";
-  $("telcoWrap").hidden=(c.cliente==="dom"&&c.sit==="cb");
-  $("telcoLb").textContent=c.cliente==="biz"?"È cliente telco WindTre (mobile o fisso)":"Ha mobile, fisso o assicurazioni WindTre (anche attivati insieme)";
+  /* situazione con WindTre: vedi pick() */
   renderOffer(c);
   var sl=readSvc("l"),sg=readSvc("g");
   $("l_info").textContent=sl?("Prezzo energia in bolletta: "+n3(sl.prezzo,4)+" €/kWh · quota fissa: "+eur(r2(sl.fissaMese))+" al mese · consumo annuo usato: "+n3(sl.cons,0)+" kWh"):"";
@@ -484,7 +486,7 @@ function calc(){
   if(c.cliente==="biz"){
     if(sl&&sl.cons>=L.limiti.luceKwh)warns.push("Luce: consumo oltre i 35.000 kWh, fuori dal Microbusiness.");
     if(sg&&sg.cons>=L.limiti.gasSmc)warns.push("Gas: consumo oltre i 25.000 Smc, fuori dal Microbusiness.");
-    if(!c.telco)warns.push("Il canvass indica il Microbusiness per clienti telco, nuovi o già WindTre.");
+    warns.push("Il Microbusiness è per professionisti e P.IVA, clienti telco nuovi o già WindTre.");
   }
   /* PUN e PSV: vedi INDICI e il pannello Parametri */
   if((sl&&sl.annualizzato)||(sg&&sg.annualizzato))warns.push("Hai inserito dati di un periodo: sono portati a 365 giorni. Per il gas, che cambia con la stagione, meglio il consumo annuo o 12 mesi di dati.");
@@ -500,10 +502,21 @@ function calc(){
   if(oG)h+=svcCard("Gas",oG,sg,sG,sg.totAnn);
   if(oL&&oG&&yes&&cosa.length===1)h+='<p class="warnbox"><strong>Da sapere:</strong> conviene solo '+cosa[0]+'. Luce e gas si possono passare separatamente, quindi si propone solo quella.</p>';
   warns.forEach(function(t){h+='<div class="warnbox">'+esc(t)+'</div>'});
+  var altTxt="";
+  if(c.cliente==="dom"&&c.sit==="new"){
+    var a2=L.off.sp50,aL=sl?svcOffer("luce",sl,c,a2):null,aG=sg?svcOffer("gas",sg,c,a2):null;
+    var tL=aL?r2(sl.totAnn-aL.totale):0,tG=aG?r2(sg.totAnn-aG.totale):0,tb=r2((tL>0.004?tL:0)+(tG>0.004?tG:0));
+    h+='<div class="panel sec"><h3>Se attiva anche mobile, fisso o assicurazioni WindTre</h3><p class="note">Con la '+esc(a2.nome)+(expired(a2)?' (scaduta il '+itDate(a2.fino)+')':'')+':</p><ul style="margin:0;padding-left:18px">'+
+      (aL?'<li>Luce: '+(tL>0.004?'risparmi ':'spendi di più ')+eur(r2(Math.abs(tL)/12))+' al mese ('+eur(Math.abs(tL))+' all\'anno)</li>':'')+
+      (aG?'<li>Gas: '+(tG>0.004?'risparmi ':'spendi di più ')+eur(r2(Math.abs(tG)/12))+' al mese ('+eur(Math.abs(tG))+' all\'anno)</li>':'')+'</ul>'+
+      '<p><strong>'+(tb>0.004?'In totale '+eur(r2(tb/12))+' al mese, '+eur(tb)+' all\'anno':'Nessun risparmio')+'</strong></p></div>';
+    altTxt="Se attiva anche mobile/fisso/assicurazioni WindTre (50 SPECIAL): "+(tb>0.004?"risparmio "+eur(r2(tb/12))+" al mese ("+eur(tb)+" all'anno)":"nessun risparmio");
+  }
   h+='<p class="note">Stima: PUN e PSV cambiano ogni mese. Il corrispettivo e il contributo fisso restano bloccati '+esc(o.durata)+'. Per un importo definitivo usa i sistemi WindTre.</p>';
   h+='<div><button class="btn small ghost" id="copyBtn" type="button">Copia il riepilogo</button> <span class="status" id="copyStatus"></span></div>';
   if(oL)sum.push("Luce: "+o.nome+" - "+(sL>0?"risparmio ":"costo in più ")+eur(r2(Math.abs(sL)/12))+" al mese ("+eur(Math.abs(sL))+" all'anno)");
   if(oG)sum.push("Gas: "+o.nome+" - "+(sG>0?"risparmio ":"costo in più ")+eur(r2(Math.abs(sG)/12))+" al mese ("+eur(Math.abs(sG))+" all'anno)");
+  if(altTxt)sum.push(altTxt);
   sum.unshift(yes?("Risparmio proponendo "+cosa.join(" e ")+": "+eur(r2(best/12))+" al mese ("+eur(best)+" all'anno)"):"Nessuna offerta WindTre conviene");
   lastSummary="Preventivo WindTre Energia\n"+sum.join("\n")+"\n(Importi stimati: PUN e PSV variabili)";
   R.innerHTML=h;
