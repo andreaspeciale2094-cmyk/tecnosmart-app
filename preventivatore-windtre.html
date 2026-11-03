@@ -1,0 +1,687 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Preventivatore WindTre Energia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: colonna unica di lavoro in tre passi. Prima chi e' il cliente (e quale offerta WindTre gli spetta), poi le bollette luce e gas, poi il verdetto. Sfondo neutro, un solo accento arancione WindTre. */
+:root{
+  --ink:#17181c;
+  --ink-2:#4d525c;
+  --paper:#f4f3f1;
+  --surface:#ffffff;
+  --line:#dcdad6;
+  --accent:#ff7a1a;
+  --accent-ink:#5c2a00;
+  --accent-soft:#ffe9d6;
+  --good:#17803f;
+  --good-soft:#e2f4e8;
+  --bad:#b83225;
+  --bad-soft:#fbe6e3;
+  --luce:#45b06f;
+  --luce-soft:#e1f4e8;
+  --gas:#1b9ad6;
+  --gas-soft:#dff1fa;
+  --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#eef0f4;--ink-2:#a9afbb;--paper:#121316;--surface:#1a1c21;--line:#2e3139;
+    --accent:#ff8a33;--accent-ink:#ffc89a;--accent-soft:#3a210c;
+    --good:#4cc77d;--good-soft:#12301f;--bad:#ff8a7c;--bad-soft:#3a1a16;--luce:#5cc486;--luce-soft:#123422;--gas:#4bb6ec;--gas-soft:#0f2a3a;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eef0f4;--ink-2:#a9afbb;--paper:#121316;--surface:#1a1c21;--line:#2e3139;
+  --accent:#ff8a33;--accent-ink:#ffc89a;--accent-soft:#3a210c;
+  --good:#4cc77d;--good-soft:#12301f;--bad:#ff8a7c;--bad-soft:#3a1a16;--luce:#5cc486;--luce-soft:#123422;--gas:#4bb6ec;--gas-soft:#0f2a3a;color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.5 var(--body);margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.7rem,4.5vw,2.4rem);line-height:1.05;font-weight:800}
+h2{font-size:1.25rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.sub{color:var(--ink-2);max-width:62ch;margin-top:6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.example{background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.example[hidden]{display:none}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.btn{background:var(--accent);color:#111;border:0;border-radius:8px;padding:10px 16px;font-weight:600;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:.9rem}
+.btn.big{min-height:52px;font-size:1.05rem;font-weight:700}
+.btn:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 24px;align-items:end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg label{padding:9px 16px;cursor:pointer;font-weight:600;background:var(--surface);min-height:44px;display:flex;align-items:center}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--accent);color:#111}
+.seg label:has(input:focus-visible){outline:3px solid var(--ink);outline-offset:-3px}
+.lbl{display:block;font-size:.85rem;color:var(--ink-2);margin-bottom:4px}
+.check{display:flex;gap:10px;align-items:center;min-height:44px}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fields .full{grid-column:1/-1}
+.f input,.f select{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:9px 10px;min-height:44px;font-variant-numeric:tabular-nums}
+.f input.letto{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.hint{font-size:.8rem;color:var(--ink-2);margin-top:3px}
+.upload{border:1px dashed var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.upload .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.upload input[type=file]{max-width:100%;min-width:0}
+.status{font-size:.9rem;min-height:1.2em}
+.status.err{color:var(--bad)}
+.status.warn{color:var(--accent-ink);background:var(--accent-soft);padding:6px 10px;border-radius:6px}
+.status.ok{color:var(--good)}
+.verdict{border-radius:12px;padding:20px;border:2px solid var(--ink);background:var(--surface);display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.verdict.yes{border-color:var(--good)}
+.verdict.no{border-color:var(--bad)}
+.vhead{font-family:var(--display);font-weight:800;letter-spacing:.04em;font-size:1rem}
+.yes .vhead{color:var(--good)}.no .vhead{color:var(--bad)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,5vw,2.5rem);line-height:1.05;font-variant-numeric:tabular-nums}
+.big span{font-size:.6em;font-weight:600}
+.yes .big{color:var(--good)}.no .big{color:var(--bad)}
+.big2{font-family:var(--display);font-weight:800;font-size:clamp(1.2rem,3.6vw,1.6rem);font-variant-numeric:tabular-nums}
+.yes .big2{color:var(--good)}
+.tag{display:inline-block;font-size:.75rem;font-weight:600;border-radius:999px;padding:2px 9px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.tag.ex{border-color:var(--good);color:var(--good)}
+.tag.st{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.tag.no{border-color:var(--bad);color:var(--bad)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:520px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.85rem;color:var(--ink-2);font-weight:500}
+td.r,th.r{text-align:right}
+tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+td.per{color:var(--ink-2)}
+details{border-top:1px solid var(--line);padding-top:10px}
+details summary{cursor:pointer;font-weight:600;min-height:32px}
+.note{font-size:.9rem;color:var(--ink-2)}
+.warnbox{background:var(--accent-soft);color:var(--accent-ink);border-radius:8px;padding:10px 12px;font-size:.92rem}
+.stopbox{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:10px 12px;font-size:.92rem;font-weight:500}
+.sec{display:flex;flex-direction:column;gap:12px}
+.svc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;overflow-x:auto}
+.svc-h{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:1.15rem;gap:8px;flex-wrap:wrap}
+.offer{color:var(--ink-2);font-size:.92rem}
+.ctab{min-width:0;font-size:1rem}
+.ctab.det{min-width:520px;font-size:.93rem}
+.ctab th,.ctab td{padding:6px 8px}
+.svsave{font-weight:700;font-size:1.05rem;margin-top:2px}
+.svsave.pos{color:var(--good)}.svsave.neg{color:var(--bad)}
+.calcdet{border-top:0;padding-top:0}
+.calcdet summary{font-weight:500;color:var(--ink-2);font-size:.9rem}
+.offerbox{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.offerbox ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:.92rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+/* Colori WindTre Luce&Gas con un senso: verde = luce, azzurro = gas, arancione = azioni e numeri chiave, nero = barra e testi */
+.kl{border-top:5px solid var(--luce)}
+.kg{border-top:5px solid var(--gas)}
+.kl h2::before,.kg h2::before,.svc.kl .svc-h strong::before,.svc.kg .svc-h strong::before{content:"";display:inline-block;width:.6em;height:.6em;border-radius:50%;margin-right:.45em;vertical-align:.05em}
+.kl h2::before,.svc.kl .svc-h strong::before{background:var(--luce)}
+.kg h2::before,.svc.kg .svc-h strong::before{background:var(--gas)}
+.kl .upload{border-color:var(--luce);background:var(--luce-soft)}
+.kg .upload{border-color:var(--gas);background:var(--gas-soft)}
+.bs .g{color:#5cc486}.bs .o{color:#ff8a33}.bs .b{color:#4bb6ec}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#111;color:#fff;border-bottom:3px solid var(--accent)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#111}
+.appbar-in{max-width:1040px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:6px;background:var(--accent);flex:none}
+.bt{font-family:var(--display);font-weight:800;font-size:1.1rem;line-height:1.1}
+.bs{font-size:.78rem;color:#c9ccd2}
+.steps{display:flex;gap:4px}
+.stp{flex:1;background:transparent;border:0;color:#c9ccd2;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-bottom:4px solid transparent;margin-bottom:-3px;font-weight:600}
+.stp b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#2c2f36;color:#fff;font-size:.85rem}
+.stp.on{color:#fff;border-bottom-color:var(--accent)}
+.stp.on b{background:var(--accent);color:#111}
+.step{display:none;flex-direction:column;gap:16px}
+.step.on{display:flex}
+.stepnav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;position:sticky;bottom:0;padding:12px 0;background:linear-gradient(transparent,var(--paper) 30%)}
+.stepnav .btn.big{flex:1;min-width:200px}
+.stepnav .btn.ghost{background:var(--surface)}
+.foot{text-align:center}
+@media (min-width:640px){.appbar-in{flex-direction:row;align-items:center;justify-content:space-between}.steps{width:420px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<header class="appbar">
+  <div class="appbar-in">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><div><div class="bt">Preventivatore Energia</div><div class="bs">WindTre <span class="g">Luce</span> <span class="o">&amp;</span> <span class="b">Gas</span></div></div></div>
+    <nav class="steps" aria-label="Passaggi">
+      <button type="button" class="stp on" data-go="1"><b>1</b><span>Cliente</span></button>
+      <button type="button" class="stp" data-go="2"><b>2</b><span>Bollette</span></button>
+      <button type="button" class="stp" data-go="3"><b>3</b><span>Risultato</span></button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<section class="step on" id="step1" aria-label="Cliente"><h1>Chi è il cliente?</h1>
+  <section class="panel">
+    <div class="setup">
+      <div>
+        <span class="lbl" id="lblCliente">Tipo di cliente</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblCliente">
+          <label><input type="radio" name="cliente" value="dom" checked><span>Privato</span></label>
+          <label><input type="radio" name="cliente" value="biz"><span>Business (P.IVA)</span></label>
+        </div>
+      </div>
+      <div id="sitWrap">
+        <span class="lbl" id="lblSit">Situazione con WindTre Luce e Gas</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblSit">
+          <label><input type="radio" name="sit" value="new" checked><span>Nuovo cliente energia</span></label>
+          <label><input type="radio" name="sit" value="cb"><span>Già cliente WindTre Luce e Gas</span></label>
+        </div>
+      </div>
+      <div class="check" id="telcoWrap">
+        <input type="checkbox" id="telco" checked>
+        <label for="telco" id="telcoLb">Ha mobile, fisso o assicurazioni WindTre (anche attivati insieme)</label>
+      </div>
+      <div class="check">
+        <input type="checkbox" id="tut">
+        <label for="tut">È ancora in tutele graduali</label>
+      </div>
+    </div>
+  </section>
+  <section id="offerBox" aria-live="polite"></section>
+<div class="stepnav"><button type="button" class="btn big" data-go="2">Avanti: le bollette</button></div>
+</section>
+
+<section class="step" id="step2" aria-label="Bollette"><h1>Le bollette</h1><p class="sub">Carica il PDF o una foto, oppure scrivi i dati. Luce e gas si possono preventivare insieme o separati: il gas WindTre si attiva anche da solo.</p>
+  <section class="panel">
+    <span class="lbl" id="lblPer">La bolletta è</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lblPer">
+      <label><input type="radio" name="per" id="per_m" value="m"><span>Mensile</span></label>
+      <label><input type="radio" name="per" id="per_b" value="b" checked><span>Bimestrale</span></label>
+    </div>
+    <div class="hint" style="margin-top:6px">Mensile: PUN e PSV del mese precedente. Bimestrale: media dei due mesi precedenti.</div>
+  </section>
+  <div class="example" id="exampleBox">
+    <span><strong>Dati di esempio.</strong> Sostituiscili con quelli della bolletta del cliente.</span>
+    <button class="btn small" id="clearExample" type="button">Svuota i campi</button>
+  </div>
+  <div class="grid2">
+    <section class="panel kl" id="cardLuce" aria-labelledby="hLuce">
+      <div class="card-head"><h2 id="hLuce">Luce</h2></div>
+      <div class="upload">
+        <label class="lbl" for="l_file">Bolletta luce: PDF, foto o schermata</label>
+        <div class="row">
+          <input type="file" id="l_file" accept="image/*,application/pdf,.pdf" multiple>
+          <button class="btn small" id="l_read" type="button" disabled>Leggi la bolletta</button>
+        </div>
+        <div class="status" id="l_status" role="status"></div>
+      </div>
+      <div class="fields">
+        <div class="f full"><label class="lbl" for="l_giorni">Giorni del periodo fatturato (365 se inserisci i dati di un anno)</label><input id="l_giorni" inputmode="decimal" value="365"></div>
+        <div class="f"><label class="lbl" for="l_cons">Consumo del periodo (kWh)</label><input id="l_cons" inputmode="decimal" value="2100"></div>
+        <div class="f"><label class="lbl" for="l_consAnn">Consumo annuo in bolletta (kWh)</label><input id="l_consAnn" inputmode="decimal" placeholder="se presente"></div>
+        <div class="f"><label class="lbl" for="l_totAnn">Spesa annua in bolletta (€)</label><input id="l_totAnn" inputmode="decimal" placeholder="se presente"><div class="hint">Informazioni storiche, IVA compresa</div></div>
+        <div class="f"><label class="lbl" for="l_en">Quota energia (€)</label><input id="l_en" inputmode="decimal" value="560,00"><div class="hint">Materia energia, solo consumi, tutte le fasce</div></div>
+        <div class="f"><label class="lbl" for="l_fix">Quota fissa (€)</label><input id="l_fix" inputmode="decimal" value="160,00"><div class="hint">Commercializzazione/vendita del periodo</div></div>
+        <div class="f"><label class="lbl" for="l_tot">Totale per i consumi (€)</label><input id="l_tot" inputmode="decimal" value="1150,00"><div class="hint">Tutto compreso, senza canone TV</div></div>
+        <div class="f full"><label class="lbl" for="l_tipo">Tipo di offerta attuale</label>
+          <select id="l_tipo"><option value="nd">Non so</option><option value="fisso">Prezzo fisso</option><option value="var">Indicizzato / variabile</option></select>
+          <div class="hint">Se è a prezzo fisso sotto 0,17 €/kWh, il canvass dice di non proporre il cambio</div></div>
+        <div class="f full"><div class="note" id="l_info"></div></div>
+      </div>
+    </section>
+
+    <section class="panel kg" id="cardGas" aria-labelledby="hGas">
+      <div class="card-head"><h2 id="hGas">Gas</h2></div>
+      <div class="upload">
+        <label class="lbl" for="g_file">Bolletta gas: PDF, foto o schermata</label>
+        <div class="row">
+          <input type="file" id="g_file" accept="image/*,application/pdf,.pdf" multiple>
+          <button class="btn small" id="g_read" type="button" disabled>Leggi la bolletta</button>
+        </div>
+        <div class="status" id="g_status" role="status"></div>
+      </div>
+      <div class="fields">
+        <div class="f full"><label class="lbl" for="g_giorni">Giorni del periodo fatturato (365 se inserisci i dati di un anno)</label><input id="g_giorni" inputmode="decimal" value="365"></div>
+        <div class="f"><label class="lbl" for="g_cons">Consumo del periodo (Smc)</label><input id="g_cons" inputmode="decimal" value="700"></div>
+        <div class="f"><label class="lbl" for="g_consAnn">Consumo annuo in bolletta (Smc)</label><input id="g_consAnn" inputmode="decimal" placeholder="se presente"></div>
+        <div class="f"><label class="lbl" for="g_totAnn">Spesa annua in bolletta (€)</label><input id="g_totAnn" inputmode="decimal" placeholder="se presente"><div class="hint">Informazioni storiche, IVA compresa</div></div>
+        <div class="f"><label class="lbl" for="g_en">Quota energia gas (€)</label><input id="g_en" inputmode="decimal" value="780,00"><div class="hint">Materia gas, solo consumi</div></div>
+        <div class="f"><label class="lbl" for="g_fix">Quota fissa (€)</label><input id="g_fix" inputmode="decimal" value="120,00"><div class="hint">Commercializzazione/vendita del periodo</div></div>
+        <div class="f"><label class="lbl" for="g_tot">Totale per i consumi (€)</label><input id="g_tot" inputmode="decimal" value="1350,00"><div class="hint">Tutto compreso</div></div>
+        <div class="f full"><label class="lbl" for="g_tipo">Tipo di offerta attuale</label>
+          <select id="g_tipo"><option value="nd">Non so</option><option value="fisso">Prezzo fisso</option><option value="var">Indicizzato / variabile</option></select>
+          <div class="hint">Se è a prezzo fisso sotto 0,60 €/Smc, il canvass dice di non proporre il cambio</div></div>
+        <div class="f full"><div class="note" id="g_info"></div></div>
+      </div>
+      <p class="hint" style="margin-top:10px">Lascia vuoti questi campi se il cliente non ha il gas o non lo vuole cambiare.</p>
+    </section>
+  </div>
+<div class="stepnav"><button type="button" class="btn ghost" data-go="1">Indietro</button><button type="button" class="btn big" data-go="3">Vedi il risultato</button></div>
+</section>
+
+<section class="step" id="step3" aria-label="Risultato"><h1>Risultato</h1>
+  <section class="sec" id="results" aria-live="polite"></section>
+
+  <section class="panel">
+    <details style="border-top:0;padding-top:0">
+      <summary>Parametri di calcolo (PUN, PSV, perdite, dispacciamento)</summary>
+      <p class="note" id="indiciInfo" style="margin-top:8px"></p>
+      <p class="note" style="margin:8px 0 12px">Tutte le offerte WindTre sono a prezzo indicizzato: il costo dipende da PUN e PSV, che cambiano ogni mese. I valori di partenza dipendono da come hai scelto la bolletta nel passo 2: mensile = PUN e PSV del mese precedente, bimestrale = media dei due mesi precedenti. È lo stesso periodo della bolletta che porta il cliente, così il confronto è alla pari. Vengono dalla tabella del punto vendita: ogni mese va aggiunta la riga nuova. Se la bolletta è di un altro periodo, scrivi qui i valori di quel periodo. Il risultato è una stima. Per un importo definitivo usa i sistemi WindTre.</p>
+      <div class="fields">
+        <div class="f"><label class="lbl" for="p_pun">PUN previsto (€/kWh)</label><input id="p_pun" inputmode="decimal" value="0,214"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
+        <div class="f"><label class="lbl" for="p_psv">PSV previsto (€/Smc)</label><input id="p_psv" inputmode="decimal" value="0,857"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
+        <div class="f"><label class="lbl" for="p_perd">Perdite di rete sulla luce (%)</label><input id="p_perd" inputmode="decimal" value="10,2"><div class="hint">Da verificare con WindTre</div></div>
+        <div class="f"><label class="lbl" for="p_disp">Dispacciamento luce (€/kWh)</label><input id="p_disp" inputmode="decimal" value="0,017"><div class="hint">Il canvass lo cita tra gli altri oneri senza dare il valore</div></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <details style="border-top:0;padding-top:0">
+      <summary>Listino WindTre usato nel calcolo</summary>
+      <div class="tbl" id="listino" style="margin-top:10px"></div>
+    </details>
+  </section>
+<div class="stepnav"><button type="button" class="btn ghost" data-go="2">Modifica i dati</button><button type="button" class="btn big" id="newBtn">Nuovo preventivo</button></div>
+<p class="note foot">Strumento interno del punto vendita. Non è un sito ufficiale WindTre e non sostituisce i sistemi di vendita WindTre.</p></section>
+</main>
+
+<script>
+(function(){
+"use strict";
+/* Listino dal canvass WindTre Luce&Gas del 07/10/2026 (agg. 14/10/2026). Prezzi IVA esclusa. Tutte le offerte: indice (PUN o PSV) + corrispettivo al consumo + contributo fisso annuo, bloccati 24 mesi. */
+var L={
+  iva:{domLuce:0.10,bizLuce:0.22,bizGas:0.22},
+  soglia:{luce:0.17,gas:0.60},
+  limiti:{luceKwh:35000,gasSmc:25000},
+  off:{
+    sp50:{id:"sp50",nome:"WindTre Luce&Gas 50 SPECIAL",fino:"2026-11-15",durata:"24 mesi",
+      luce:{spread:0.0139,fisso:78},gas:{spread:0.0483,fisso:78},
+      per:"Nuovi clienti Luce&Gas con almeno un'offerta WindTre fissa, mobile o assicurazioni (già attiva o attivata insieme).",
+      proc:["Switch-in","Switch-in con voltura","Subentro","Nuovo allaccio","Nuova attivazione"],
+      canali:"Punti vendita, teleselling, call center, online"},
+    ns:{id:"ns",nome:"WindTre Luce&Gas New Start Casa",fino:null,durata:"24 mesi",
+      luce:{spread:0.0139,fisso:156},gas:{spread:0.0483,fisso:156},
+      per:"Nuovi clienti Luce&Gas senza mobile, fisso o assicurazioni WindTre.",
+      nota:"Prezzi indicati dal punto vendita, non presenti nel canvass: stesso corrispettivo della 50 SPECIAL, contributo fisso a prezzo pieno (156 €/anno). Da confermare.",
+      proc:["Switch-in","Switch-in con voltura","Subentro","Nuovo allaccio","Nuova attivazione"],
+      canali:"Punti vendita, teleselling, call center, online"},
+    spt:{id:"spt",nome:"WindTre Luce&Gas SPECIAL PER TE",fino:"2027-01-10",durata:"24 mesi",
+      luce:{spread:0.0278,fisso:60},gas:{spread:0.0965,fisso:60},
+      per:"Già clienti WindTre Luce&Gas (New Start Casa e New Start Casa Sconto Multiservice), solo tramite cambio piano.",
+      proc:["Cambio piano"],
+      canali:"Solo punti vendita"},
+    micro:{id:"micro",nome:"WindTre Luce&Gas Microbusiness",fino:null,durata:"24 mesi",
+      luce:{spread:0.0278,fisso:114},gas:{spread:0.0965,fisso:114},
+      per:"Professionisti e P.IVA, clienti telco nuovi o già WindTre. Luce sotto 35.000 kWh e 55 kW, gas sotto 25.000 Smc.",
+      proc:["Switch-in","Switch-in con voltura","Voltura","Cambio piano","Subentro","Nuovo allaccio","Nuova attivazione"],
+      canali:"Come da canvass"}
+  }
+};
+/* INDICI DI MERCATO: la riga qui sotto e' aggiornata ogni mattina da un'attivita' programmata. Non cambiare il formato. */
+var INDICI={fonte:"tabella PUN (H24) e PSV del punto vendita",aggiornato:"2026-11-03",mesi:{"2026-09":{pun:0.207542,psv:0.843182},"2026-10":{pun:0.230817,psv:0.945436}}};
+function giorniDa(s){var p=s.split("-"),d=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));return Math.floor((Date.now()-d.getTime())/86400000)}
+var MESI_IT=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+function chiaveMese(off){var d=new Date(),y=d.getFullYear(),m=d.getMonth()+1-off;while(m<1){m+=12;y--}return y+"-"+String(m).padStart(2,"0")}
+function nomeMese(k){var p=k.split("-");return MESI_IT[Number(p[1])-1]+" "+p[0]}
+function r6(x){return Math.round(x*1e6)/1e6}
+function indiciPer(){
+  var k1=chiaveMese(1),k2=chiaveMese(2),a=INDICI.mesi[k1],b=INDICI.mesi[k2];
+  if($("per_m").checked){
+    if(!a)return {mens:true,manca:[nomeMese(k1)]};
+    return {pun:a.pun,psv:a.psv,mens:true,et:"mese precedente ("+nomeMese(k1)+")"};
+  }
+  var man=[];if(!a)man.push(nomeMese(k1));if(!b)man.push(nomeMese(k2));
+  if(man.length)return {mens:false,manca:man};
+  return {pun:(a.pun+b.pun)/2,psv:(a.psv+b.psv)/2,mens:false,et:"media dei due mesi precedenti ("+nomeMese(k2)+" e "+nomeMese(k1)+")"};
+}
+function applyIndici(){
+  var v=indiciPer();
+  if(v.manca){
+    $("p_pun").value="";$("p_psv").value="";
+    $("indiciInfo").textContent="Mancano PUN e PSV di "+v.manca.join(" e ")+" nella tabella. Scrivili a mano qui sotto, oppure aggiungi il mese alla tabella.";
+    return;
+  }
+  $("p_pun").value=String(r6(v.pun)).replace(".",",");
+  $("p_psv").value=String(r6(v.psv)).replace(".",",");
+  $("indiciInfo").textContent="Bolletta "+(v.mens?"mensile":"bimestrale")+": "+v.et+". PUN "+n3(r6(v.pun),6)+" €/kWh · PSV "+n3(r6(v.psv),6)+" €/Smc. Fonte: "+INDICI.fonte+" (aggiornata il "+itDate(INDICI.aggiornato)+").";
+}
+function setPer(v){$("per_"+v).checked=true;applyIndici()}
+function initIndici(){applyIndici();$("per_m").addEventListener("change",applyIndici);$("per_b").addEventListener("change",applyIndici)}
+var $=function(id){return document.getElementById(id)};
+function num(s){
+  if(s==null)return NaN; s=String(s).trim().replace(/\s|€/g,""); if(!s)return NaN;
+  if(s.indexOf(",")>-1) s=s.replace(/\./g,"").replace(",",".");
+  var n=Number(s); return isFinite(n)?n:NaN;
+}
+function r2(x){return Math.round((x+Number.EPSILON)*100)/100}
+var fE=new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"});
+function eur(x){return fE.format(x)}
+function n3(x,d){return new Intl.NumberFormat("it-IT",{minimumFractionDigits:d,maximumFractionDigits:d}).format(x)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function effIvaDom(c){return c>0?(Math.min(c,480)*0.10+Math.max(c-480,0)*0.22)/c:0.10}
+function todayStr(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function itDate(s){var p=s.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
+function expired(o){return !!o.fino&&todayStr()>o.fino}
+
+function cfg(){
+  var cl=document.querySelector('input[name="cliente"]:checked').value;
+  var st=document.querySelector('input[name="sit"]:checked').value;
+  return {cliente:cl,sit:cl==="biz"?"new":st,telco:$("telco").checked,tut:$("tut").checked,
+    pun:num($("p_pun").value),psv:num($("p_psv").value),perd:num($("p_perd").value),disp:num($("p_disp").value)};
+}
+function pick(c){
+  if(c.cliente==="biz")return {o:L.off.micro};
+  if(c.sit==="cb")return {o:L.off.spt};
+  if(c.telco)return {o:L.off.sp50};
+  return {o:L.off.ns};
+}
+function readSvc(p){
+  var giorni=num($(p+"_giorni").value),cons=num($(p+"_cons").value),consAnn=num($(p+"_consAnn").value),
+      totAnnIn=num($(p+"_totAnn").value),
+      en=num($(p+"_en").value),fix=num($(p+"_fix").value),tot=num($(p+"_tot").value);
+  if(!isFinite(fix))fix=0;
+  if(!(giorni>0)||!(cons>0)||!(en>=0)||(!(tot>0)&&!(totAnnIn>0)))return null;
+  var f=365/giorni,consA=consAnn>0?consAnn:cons*f,prezzo=en/cons;
+  var mesiEsatti=giorni/30.4167,mesi=Math.abs(giorni-Math.round(mesiEsatti)*30.4167)<=4&&Math.round(mesiEsatti)>0?Math.round(mesiEsatti):mesiEsatti;
+  var matEn=prezzo*consA,matFix=fix/mesi*12;
+  return {f:f,giorni:giorni,cons:consA,totAnn:r2(totAnnIn>0?totAnnIn:tot*f),matEn:matEn,matFix:matFix,mat:matEn+matFix,
+    prezzo:prezzo,enP:en,fixP:fix,consP:cons,fissaMese:fix/mesi,annualizzato:giorni!==365&&!(consAnn>0)};
+}
+
+/* Nuova spesa annua con l'offerta WindTre: stima, perche' PUN e PSV cambiano ogni mese. */
+function svcOffer(kind,s,c,o){
+  var p=o[kind],u=kind==="luce"?"kWh":"Smc";
+  var idx=kind==="luce"?c.pun:c.psv,base=idx+p.spread,unit,iva;
+  if(kind==="luce"){unit=base*(1+c.perd/100)+c.disp;iva=c.cliente==="biz"?L.iva.bizLuce:L.iva.domLuce}
+  else{unit=base;iva=c.cliente==="biz"?L.iva.bizGas:effIvaDom(s.cons)}
+  var nuova=s.cons*unit+p.fisso;
+  var tot=r2(s.totAnn+(nuova-s.mat)*(1+iva));
+  var lines=[[(kind==="luce"?"PUN":"PSV")+" previsto + corrispettivo ("+n3(idx,4)+" + "+n3(p.spread,4)+")",n3(base,4)+" €/"+u]];
+  if(kind==="luce")lines.push(["Con perdite di rete e dispacciamento",n3(unit,4)+" €/"+u]);
+  lines.push([(kind==="luce"?"Energia: ":"Gas: ")+n3(s.cons,0)+" "+u,eur(r2(s.cons*unit))],
+    ["Contributo fisso annuo",eur(p.fisso)],["Nuova materia (senza IVA)",eur(r2(nuova))],
+    ["Materia attuale (annua)",eur(r2(s.mat))],["Differenza × (1 + IVA "+n3(iva*100,1)+"%)",(nuova-s.mat>=0?"+":"−")+eur(Math.abs(r2((nuova-s.mat)*(1+iva))))],
+    ["Totale annuo stimato",eur(tot)]);
+  return {nome:o.nome,durata:o.durata,totale:tot,en:r2(s.cons*unit),fix:p.fisso,nuova:nuova,iva:iva,prezzo:unit,unit:u,lines:lines};
+}
+
+function renderOffer(c){
+  var pk=pick(c),h;
+  if(!pk.o){
+    h='<div class="offerbox"><h3>'+esc(pk.nome)+'</h3><p class="note">Cliente nuovo senza mobile, fisso o assicurazioni WindTre. I prezzi di questa offerta non sono nel canvass del 07/10/2026, quindi qui non si può calcolare. Se il cliente attiva anche mobile, fisso o assicurazioni, spunta la casella: si applica la 50 SPECIAL.</p></div>';
+  }else{
+    var o=pk.o,ex=expired(o);
+    var val=o.fino?(ex?'<span class="tag no">Scaduta il '+itDate(o.fino)+'</span>':'<span class="tag ex">Valida fino al '+itDate(o.fino)+'</span>'):'<span class="tag ex">Prezzi confermati dal canvass</span>';
+    h='<div class="offerbox"><div class="svc-h"><h3>'+esc(o.nome)+'</h3>'+val+'</div>'+
+      (ex?'<div class="stopbox">Il canvass indica questa offerta fino al '+itDate(o.fino)+'. Controlla che sia stata prorogata prima di proporla.</div>':'')+
+      '<p class="note">'+esc(o.per)+'</p>'+
+      (o.nota?'<div class="warnbox">'+esc(o.nota)+'</div>':'')+
+      '<ul><li>Luce: PUN + '+n3(o.luce.spread,4)+' €/kWh · contributo fisso '+eur(o.luce.fisso)+'/anno ('+eur(r2(o.luce.fisso/12))+'/mese)</li>'+
+      '<li>Gas: PSV + '+n3(o.gas.spread,4)+' €/Smc · contributo fisso '+eur(o.gas.fisso)+'/anno ('+eur(r2(o.gas.fisso/12))+'/mese)</li>'+
+      '<li>Corrispettivo e contributo fisso bloccati '+esc(o.durata)+'. Prezzi IVA esclusa.</li></ul>'+
+      '<div class="chips">'+o.proc.map(function(x){return '<span class="tag">'+esc(x)+'</span>'}).join("")+'</div>'+
+      '<p class="note">Canali: '+esc(o.canali)+'. Luce e gas si possono attivare insieme o separati.</p></div>';
+  }
+  $("offerBox").innerHTML=h;
+}
+
+var lastSummary="";
+function svcCard(titolo,o,sv,sav,oggi){
+  function r3(l,a,b,c){return '<tr class="'+(c||"")+'"><td>'+l+'</td><td class="r">'+a+'</td><td class="r">'+b+'</td></tr>'}
+  function r4(l,pe,a,b,c){return '<tr class="'+(c||"")+'"><td>'+l+'</td><td class="r per">'+pe+'</td><td class="r">'+a+'</td><td class="r">'+b+'</td></tr>'}
+  var u=o.unit,pos=sav>0.004,neg=sav<-0.004;
+  var simple=r3("Energia",n3(sv.prezzo,4)+" €/"+u,n3(o.prezzo,4)+" €/"+u)+
+    r3("Contributo fisso",eur(r2(sv.fissaMese))+" al mese",eur(r2(o.fix/12))+" al mese")+
+    r3("Spesa in un anno",eur(r2(sv.mat*(1+o.iva))),eur(r2(o.nuova*(1+o.iva))),"tot");
+  var det=r4("Prezzo energia",n3(sv.prezzo,4)+" €/"+u,n3(sv.prezzo,4)+" €/"+u,n3(o.prezzo,4)+" €/"+u)+
+    r4("Quota energia",eur(sv.enP)+" ("+n3(sv.consP,0)+" "+u+")",eur(r2(sv.matEn))+" ("+n3(sv.cons,0)+" "+u+")",eur(o.en))+
+    r4("Quota fissa",eur(sv.fixP),eur(r2(sv.matFix)),eur(o.fix))+
+    r4("Energia + fisso (senza IVA)",eur(r2(sv.enP+sv.fixP)),eur(r2(sv.mat)),eur(r2(o.nuova)),"tot")+
+    r4("Con IVA "+n3(o.iva*100,1)+"%","—",eur(r2(sv.mat*(1+o.iva))),eur(r2(o.nuova*(1+o.iva))),"tot");
+  var lines='<ul style="margin:8px 0 0;padding:0;list-style:none;font-size:.88rem;color:var(--ink-2)">'+o.lines.map(function(l){return '<li style="display:flex;justify-content:space-between;gap:12px"><span>'+esc(l[0])+'</span><span style="color:var(--ink)">'+esc(l[1])+'</span></li>'}).join("")+'</ul>';
+  return '<div class="svc '+(titolo==="Luce"?"kl":"kg")+'"><div class="svc-h"><strong>'+titolo+'</strong><span class="tag '+(pos?"ex":"no")+'">'+(pos?"conviene":"non conviene")+'</span></div>'+
+    '<div class="offer">'+esc(o.nome)+' · '+esc(o.durata)+' · <span class="tag st">stima</span></div>'+
+    '<table class="ctab"><thead><tr><th></th><th class="r">Oggi</th><th class="r">WindTre</th></tr></thead><tbody>'+simple+'</tbody></table>'+
+    '<div class="note">Energia + contributo fisso, IVA compresa</div>'+
+    '<details class="calcdet"><summary>Vedi il calcolo</summary><div class="tbl"><table class="ctab det"><thead><tr><th></th><th class="r">In bolletta ('+Math.round(sv.giorni)+' giorni)</th><th class="r">Oggi, 12 mesi</th><th class="r">WindTre, 12 mesi</th></tr></thead><tbody>'+det+'</tbody></table>'+lines+'</div></details>'+
+    '<div class="svsave '+(pos?"pos":neg?"neg":"")+'">'+(pos?"Risparmi ":neg?"Spendi di più: ":"Stessa spesa ")+(Math.abs(sav)>0.004?eur(r2(Math.abs(sav)/12))+' al mese · '+eur(Math.abs(sav))+' all\'anno':'')+'</div></div>';
+}
+
+function calc(){
+  var c=cfg(),R=$("results");
+  $("sitWrap").hidden=c.cliente==="biz";
+  $("telcoWrap").hidden=(c.cliente==="dom"&&c.sit==="cb");
+  $("telcoLb").textContent=c.cliente==="biz"?"È cliente telco WindTre (mobile o fisso)":"Ha mobile, fisso o assicurazioni WindTre (anche attivati insieme)";
+  renderOffer(c);
+  var sl=readSvc("l"),sg=readSvc("g");
+  $("l_info").textContent=sl?("Prezzo energia in bolletta: "+n3(sl.prezzo,4)+" €/kWh · quota fissa: "+eur(r2(sl.fissaMese))+" al mese · consumo annuo usato: "+n3(sl.cons,0)+" kWh"):"";
+  $("g_info").textContent=sg?("Prezzo gas in bolletta: "+n3(sg.prezzo,4)+" €/Smc · quota fissa: "+eur(r2(sg.fissaMese))+" al mese · consumo annuo usato: "+n3(sg.cons,0)+" Smc"):"";
+  var pk=pick(c);
+  if(!pk.o){R.innerHTML='<div class="panel"><h2>Risultato</h2><p class="note" style="margin-top:6px">Per questo cliente serve l\'offerta '+esc(pk.nome)+', che non ha prezzi nel canvass. Spunta la casella di mobile, fisso o assicurazioni WindTre se il cliente li attiva insieme.</p></div>';lastSummary="";return}
+  if(!sl&&!sg){R.innerHTML='<div class="panel"><h2>Risultato</h2><p class="note" style="margin-top:6px">Inserisci giorni, consumo e totale della bolletta luce o gas per vedere il confronto.</p></div>';lastSummary="";return}
+  var mPun=sl&&!(c.pun>0),mPsv=sg&&!(c.psv>0);
+  if(mPun||mPsv){R.innerHTML='<div class="stopbox">Manca '+(mPun?"il PUN":"")+(mPun&&mPsv?" e ":"")+(mPsv?"il PSV":"")+' del periodo della bolletta. Scrivilo nei parametri del passo 3, oppure aggiungi il mese alla tabella.</div>';lastSummary="";return}
+  var o=pk.o,oL=sl?svcOffer("luce",sl,c,o):null,oG=sg?svcOffer("gas",sg,c,o):null;
+  var sL=oL?r2(sl.totAnn-oL.totale):0,sG=oG?r2(sg.totAnn-oG.totale):0;
+  var best=r2((sL>0.004?sL:0)+(sG>0.004?sG:0)),yes=best>0.004,h="",sum=[];
+  var cosa=[];if(oL&&sL>0.004)cosa.push("luce");if(oG&&sG>0.004)cosa.push("gas");
+  var warns=[],stops=[];
+  if(expired(o))stops.push("Offerta "+esc(o.nome)+" scaduta il "+itDate(o.fino)+" secondo il canvass: controlla la proroga prima di proporla.");
+  if(c.tut)stops.push("Il cliente è ancora in tutele graduali: il canvass dice di posticipare il passaggio.");
+  if(sl&&$("l_tipo").value==="fisso"&&sl.prezzo<L.soglia.luce)stops.push("Luce: prezzo fisso di "+n3(sl.prezzo,4)+" €/kWh, sotto 0,17. Il canvass dice di posticipare: oggi il cliente ha condizioni ancora vantaggiose.");
+  if(sg&&$("g_tipo").value==="fisso"&&sg.prezzo<L.soglia.gas)stops.push("Gas: prezzo fisso di "+n3(sg.prezzo,4)+" €/Smc, sotto 0,60. Il canvass dice di posticipare: oggi il cliente ha condizioni ancora vantaggiose.");
+  if(c.cliente==="biz"){
+    if(sl&&sl.cons>=L.limiti.luceKwh)warns.push("Luce: consumo oltre i 35.000 kWh, fuori dal Microbusiness.");
+    if(sg&&sg.cons>=L.limiti.gasSmc)warns.push("Gas: consumo oltre i 25.000 Smc, fuori dal Microbusiness.");
+    if(!c.telco)warns.push("Il canvass indica il Microbusiness per clienti telco, nuovi o già WindTre.");
+  }
+  /* PUN e PSV: vedi INDICI e il pannello Parametri */
+  if((sl&&sl.annualizzato)||(sg&&sg.annualizzato))warns.push("Hai inserito dati di un periodo: sono portati a 365 giorni. Per il gas, che cambia con la stagione, meglio il consumo annuo o 12 mesi di dati.");
+  stops.forEach(function(t){h+='<div class="stopbox">'+t+'</div>'});
+  h+='<div class="verdict '+(yes?"yes":"no")+'">';
+  if(yes){
+    h+='<div class="vhead">CONVIENE'+(cosa.length?" · "+cosa.join(" E ").toUpperCase():"")+'</div><div class="big">'+eur(r2(best/12))+' <span>al mese</span></div><div class="big2">'+eur(best)+' all\'anno</div>';
+  }else{
+    h+='<div class="vhead">NON CONVIENE</div><div class="big">Meglio non cambiare</div><p>L\'offerta WindTre costa più della spesa di oggi.</p>';
+  }
+  h+='</div>';
+  if(oL)h+=svcCard("Luce",oL,sl,sL,sl.totAnn);
+  if(oG)h+=svcCard("Gas",oG,sg,sG,sg.totAnn);
+  if(oL&&oG&&yes&&cosa.length===1)h+='<p class="warnbox"><strong>Da sapere:</strong> conviene solo '+cosa[0]+'. Luce e gas si possono passare separatamente, quindi si propone solo quella.</p>';
+  warns.forEach(function(t){h+='<div class="warnbox">'+esc(t)+'</div>'});
+  h+='<p class="note">Stima: PUN e PSV cambiano ogni mese. Il corrispettivo e il contributo fisso restano bloccati '+esc(o.durata)+'. Per un importo definitivo usa i sistemi WindTre.</p>';
+  h+='<div><button class="btn small ghost" id="copyBtn" type="button">Copia il riepilogo</button> <span class="status" id="copyStatus"></span></div>';
+  if(oL)sum.push("Luce: "+o.nome+" - "+(sL>0?"risparmio ":"costo in più ")+eur(r2(Math.abs(sL)/12))+" al mese ("+eur(Math.abs(sL))+" all'anno)");
+  if(oG)sum.push("Gas: "+o.nome+" - "+(sG>0?"risparmio ":"costo in più ")+eur(r2(Math.abs(sG)/12))+" al mese ("+eur(Math.abs(sG))+" all'anno)");
+  sum.unshift(yes?("Risparmio proponendo "+cosa.join(" e ")+": "+eur(r2(best/12))+" al mese ("+eur(best)+" all'anno)"):"Nessuna offerta WindTre conviene");
+  lastSummary="Preventivo WindTre Energia\n"+sum.join("\n")+"\n(Importi stimati: PUN e PSV variabili)";
+  R.innerHTML=h;
+  var cb=$("copyBtn");
+  if(cb)cb.onclick=function(){
+    var st=$("copyStatus");
+    function ok(){st.className="status ok";st.textContent="Riepilogo copiato"}
+    function ko(){st.className="status err";st.textContent="Copia non riuscita: seleziona e copia il testo a mano"}
+    try{navigator.clipboard.writeText(lastSummary).then(ok,ko)}catch(e){ko()}
+  };
+}
+
+function renderListino(){
+  var O=L.off,h='<table><thead><tr><th>Offerta</th><th>Prezzi del canvass (IVA esclusa, 24 mesi)</th></tr></thead><tbody>';
+  function row(o,extra){return '<tr><td><strong>'+esc(o.nome)+'</strong><div class="note">'+(o.fino?'fino al '+itDate(o.fino):'senza scadenza indicata')+'</div></td><td>Luce: PUN + '+n3(o.luce.spread,4)+' €/kWh, fisso '+eur(o.luce.fisso)+'/anno<br>Gas: PSV + '+n3(o.gas.spread,4)+' €/Smc, fisso '+eur(o.gas.fisso)+'/anno<br>'+esc(o.per)+(extra||"")+'</td></tr>'}
+  h+=row(O.sp50," Sconto del 50% sul corrispettivo e sul fisso (listino pieno: 0,0278 €/kWh, 0,0965 €/Smc, 156 €/anno).");
+  h+=row(O.spt," Extra sconto sul fisso: 96 € in 24 mesi rispetto ai 156 €/anno.");
+  h+=row(O.micro," Fisso 210 €/anno meno 96 € di sconto.");
+  h+=row(O.ns," "+O.ns.nota);
+  h+='<tr><td>Quando non proporre il cambio</td><td>Prezzo fisso sotto 0,17 €/kWh (luce) o 0,60 €/Smc (gas). Cliente ancora in tutele graduali.</td></tr>';
+  h+='<tr><td>Stime PUN / PSV</td><td>PUN: ott-dic 26 0,2138 · gen-mar 27 0,1972 · apr-giu 27 0,1302 · lug-set 27 0,1384 €/kWh.<br>PSV: ott-dic 26 0,8569 · gen-mar 27 0,8432 · apr-giu 27 0,6219 · lug-set 27 0,5752 €/Smc.</td></tr>';
+  h+='<tr><td>Pronto Assistenza (facoltativo)</td><td>5,99 €/mese per fornitura, IVA inclusa. Non è incluso nel confronto.</td></tr>';
+  h+='</tbody></table>';
+  $("listino").innerHTML=h;
+}
+
+var sample=null,limits=null;
+function setStatus(p,cls,msg){var e=$(p+"_status");e.className="status "+cls;e.textContent=msg}
+function markRead(ids){ids.forEach(function(id){$(id).classList.add("letto")})}
+var PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+var pdfReady=null;
+function loadPdfjs(){
+  if(pdfReady)return pdfReady;
+  pdfReady=new Promise(function(res,rej){
+    var sc=document.createElement("script");sc.src=PDFJS+"pdf.min.js";
+    sc.onload=function(){window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";res(window.pdfjsLib)};
+    sc.onerror=rej;document.head.appendChild(sc);
+  });
+  return pdfReady;
+}
+function pdfToImages(file,maxPages){
+  return loadPdfjs().then(function(lib){
+    return file.arrayBuffer().then(function(buf){return lib.getDocument({data:buf}).promise}).then(function(doc){
+      var n=Math.min(doc.numPages,maxPages),out=[],chain=Promise.resolve(),i;
+      function one(k){return doc.getPage(k).then(function(pg){
+        var vp=pg.getViewport({scale:1.6}),cv=document.createElement("canvas");
+        cv.width=vp.width;cv.height=vp.height;
+        return pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise.then(function(){
+          return new Promise(function(r){cv.toBlob(function(b){out.push(b);r()},"image/jpeg",0.85)});
+        });
+      })}
+      for(i=1;i<=n;i++){(function(k){chain=chain.then(function(){return one(k)})})(i)}
+      return chain.then(function(){return out});
+    });
+  });
+}
+function prepImages(files,max){
+  var list=Array.prototype.slice.call(files),imgs=[],chain=Promise.resolve();
+  list.forEach(function(f){chain=chain.then(function(){
+    var room=max-imgs.length; if(room<=0)return;
+    var isPdf=f.type==="application/pdf"||/\.pdf$/i.test(f.name);
+    if(!isPdf){imgs.push(f);return}
+    return pdfToImages(f,room).then(function(a){imgs=imgs.concat(a)});
+  })});
+  return chain.then(function(){return imgs});
+}
+var PROFILI=[
+  {nome:"Iren",servizio:"luce",hint:"Bolletta Iren Mercato (luce). Periodo: \"Periodo di riferimento\" in prima pagina. Consumo del periodo: \"Consumo totale fatturato nel periodo\". Consumo annuo: riquadro \"Consumo Annuo (kWh)\", colonna TOTALE (somma F1+F2+F3). Nello \"Scontrino dell'energia\": quota_energia = importo della riga \"di cui spesa per la vendita di energia elettrica\" sotto \"Quota per consumi / ENERGIA ATTIVA\"; quota_fissa = importo della riga \"di cui spesa per la vendita di energia elettrica\" sotto \"Quota fissa\" (NON la quota potenza, NON \"spesa per la rete\"). Controllo: la somma delle due quote è uguale a \"Totale di spesa dovuto per l'offerta\" nel Box dell'offerta. totale_senza_canone_tv = riga \"Totale bolletta\" dello scontrino (il canone TV è una riga separata dopo). spesa_annua = \"Spesa annua sostenuta (iva compresa)\" nelle Informazioni storiche. tipo_offerta: \"Tipologia offerta\" nel Box dell'offerta."}
+];
+function profiliTesto(){
+  return PROFILI.map(function(p){return "- Se il fornitore è "+p.nome+" ("+p.servizio+"): "+p.hint}).join("\n");
+}
+
+/* Lettura bollette fuori da Claude: indirizzo del servizio. Vuoto = non attivo. */
+var READ_API_URL="";
+function toJpegBase64(blob){
+  return createImageBitmap(blob).then(function(bm){
+    var sc=Math.min(1,1800/Math.max(bm.width,bm.height)),cv=document.createElement("canvas");
+    cv.width=Math.round(bm.width*sc);cv.height=Math.round(bm.height*sc);
+    var cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(bm,0,0,cv.width,cv.height);
+    return cv.toDataURL("image/jpeg",0.85).split(",")[1];
+  });
+}
+function accessCode(){
+  var c=null;try{c=localStorage.getItem("prev_code")}catch(e){}
+  if(!c){c=window.prompt("Codice di accesso per la lettura automatica");if(!c)throw {code:"no_code"};try{localStorage.setItem("prev_code",c)}catch(e){}}
+  return c;
+}
+function askBill(prompt,imgs){
+  if(sample&&limits&&limits.images)return sample.json(prompt,{images:imgs});
+  if(!READ_API_URL)return Promise.reject({code:"unavailable"});
+  var code=accessCode();
+  return Promise.all(imgs.map(toJpegBase64)).then(function(b64){
+    return fetch(READ_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code,prompt:prompt,images:b64})});
+  }).then(function(r){
+    if(r.status===401){try{localStorage.removeItem("prev_code")}catch(e){}throw {code:"bad_code"}}
+    if(r.status===429)throw {code:"rate_limited"};
+    if(!r.ok)throw {code:"api_error"};
+    return r.json();
+  }).then(function(d){
+    var t=String(d.text||""),m=t.match(/\{[\s\S]*\}/);
+    if(!m)throw {code:"invalid_json"};
+    try{return JSON.parse(m[0])}catch(e){throw {code:"invalid_json"}}
+  });
+}
+function readBill(p){
+  var files=$(p+"_file").files;
+  if(!files||!files.length)return;
+  var kind=p==="l"?"luce":"gas";
+  var btn=$(p+"_read");btn.disabled=true;setStatus(p,"","Lettura in corso, può richiedere fino a un minuto...");
+  var unit=kind==="luce"?"kWh":"Smc";
+  var prompt='Le immagini sono la bolletta '+(kind==="luce"?"della luce (energia elettrica)":"del gas")+' di un cliente italiano. Leggi i dati e rispondi solo con un oggetto JSON con queste chiavi. Usa numeri con il punto decimale. Scrivi null quando un dato non è chiaramente leggibile e non indovinare mai.\nMODELLO BASE (vale per tutti i gestori, luce e gas, bollette da luglio 2025, struttura imposta da ARERA): la prima parte è il frontespizio con il totale da pagare; poi lo "Scontrino dell\'energia" con le righe "Quota per consumi", "Quota fissa" e (solo luce) "Quota potenza"; ogni quota è divisa in "di cui spesa per la vendita" e "di cui spesa per la rete e gli oneri generali di sistema". Il confronto riguarda SOLO la parte "vendita": quota_energia = "spesa per la vendita" della Quota per consumi; quota_fissa = "spesa per la vendita" della Quota fissa. Mai usare le parti rete/oneri e mai la quota potenza. Il "Box dell\'offerta" riporta "Totale di spesa dovuto per l\'offerta" con il "di cui quota fissa" e il "di cui quota consumi": serve per controllare che quota_energia + quota_fissa coincidano. Consumo annuo e "Spesa annua" (esclude canone TV e altre partite) sono nelle "Informazioni storiche" o nel riquadro "consumo annuo" del frontespizio. Se la bolletta è precedente a luglio 2025 non ha lo scontrino: cerca nel riepilogo la "Spesa per la materia energia/gas" divisa in quota energia (consumi) e quota fissa (commercializzazione), senza trasporto, oneri e imposte. Il consumo e le spese sono del periodo fatturato di questa bolletta.\nMODELLI NOTI PER GESTORE (usali solo se il fornitore coincide e il servizio è lo stesso):\n'+profiliTesto()+'\nPer gli altri gestori cerca le stesse voci con il criterio generale sopra.\n{"giorni_periodo": giorni del periodo fatturato (dal "Periodo di riferimento"),\n"consumo_periodo": '+unit+' fatturati nel periodo,\n"consumo_annuo": consumo annuo in '+unit+' dalle "Informazioni storiche" o dal riquadro consumo annuo (totale di tutte le fasce), altrimenti null,\n"spesa_annua": "Spesa annua sostenuta" (IVA compresa) delle informazioni storiche, altrimenti null,\n"quota_energia": euro della "spesa per la vendita" riferita alla quota consumi (somma di tutte le fasce, senza quota fissa),\n"quota_fissa": euro della "spesa per la vendita" riferita alla quota fissa (commercializzazione/vendita del periodo; NON la quota potenza e NON la parte rete e oneri),\n"totale_senza_canone_tv": euro del "Totale bolletta" o totale dei consumi, PRIMA di aggiungere il canone TV,\n"canone_tv": euro di canone TV addebitato nel periodo, altrimenti null,\n"totale_da_pagare": totale da pagare riportato in prima pagina,\n"prezzo_energia": prezzo unitario di vendita in euro per '+unit+' se riportato, altrimenti null,\n"potenza_kw": potenza impegnata in kW oppure null,\n"fornitore": nome del fornitore,\n"tipo_offerta": "fisso" o "indicizzato" se indicato nel Box dell\'offerta, altrimenti null,\n"mercato": "libero" oppure "tutele graduali" se indicato nel frontespizio (pagina 1), altrimenti null,\n"note": una frase su cosa è poco leggibile, oppure null}\nNon includere ricalcoli, arretrati, interessi o altri addebiti.';
+  prepImages(files,(limits&&limits.images)?limits.images.maxCount:6).then(function(imgs){return askBill(prompt,imgs)}).then(function(d){
+    var ok=[];
+    function put(id,v,dec){if(v!=null&&isFinite(Number(v))){$(id).value=String(Number(v).toFixed(dec)).replace(".",",");ok.push(id)}}
+    put(p+"_giorni",d.giorni_periodo,0);put(p+"_cons",d.consumo_periodo,0);
+    if(d.giorni_periodo!=null){var gp=Number(d.giorni_periodo);if(gp>=25&&gp<=35)setPer("m");else if(gp>=55&&gp<=70)setPer("b")}
+    if(d.consumo_annuo!=null)put(p+"_consAnn",d.consumo_annuo,0);
+    put(p+"_en",d.quota_energia,2);put(p+"_fix",d.quota_fissa,2);
+    if(d.spesa_annua!=null)put(p+"_totAnn",d.spesa_annua,2);
+    var warn=[];
+    var tsc=d.totale_senza_canone_tv;
+    if(tsc==null&&d.totale_da_pagare!=null)tsc=Number(d.totale_da_pagare)-(Number(d.canone_tv)||0);
+    if(tsc!=null)put(p+"_tot",tsc,2);else warn.push("totale della bolletta non letto");
+    if(d.quota_energia==null||d.quota_fissa==null)warn.push("quota energia o quota fissa non lette");
+    if(d.consumo_annuo==null)warn.push("consumo annuo non trovato: uso il consumo del periodo riportato a 12 mesi");
+    if(d.tipo_offerta){var t=String(d.tipo_offerta).toLowerCase();$(p+"_tipo").value=t.indexOf("fiss")>-1?"fisso":(t.indexOf("indic")>-1||t.indexOf("variab")>-1)?"var":"nd"}
+    if(d.mercato&&/tutel/i.test(String(d.mercato))){$("tut").checked=true;warn.push("il cliente risulta in tutele graduali")}
+    markRead(ok);
+    var msg="Dati letti"+(d.fornitore?" ("+d.fornitore+")":"")+". I campi evidenziati vanno controllati con la bolletta.";
+    if(warn.length)msg+=" Attenzione: "+warn.join("; ")+".";
+    if(d.note)msg+=" "+d.note;
+    setStatus(p,warn.length?"warn":"ok",msg);
+    $("exampleBox").hidden=true;
+    calc();
+  }).catch(function(e){
+    var m={not_granted:"Non hai dato il permesso a usare Claude in questa pagina.",rate_limited:"Troppe richieste. Riprova tra qualche minuto.",image_rejected:"Immagine non accettata. Usa una foto o schermata in JPG, PNG o WebP.",bad_code:"Codice di accesso errato. Riprova.",no_code:"Serve il codice di accesso per la lettura automatica.",api_error:"Il servizio di lettura non risponde. Riprova o inserisci i dati a mano.",invalid_json:"Lettura non riuscita. Prova con una foto più nitida o inserisci i dati a mano.",session_expired:"Sessione scaduta. Accedi di nuovo."}[e&&e.code];
+    setStatus(p,"err",m||(e&&e.code?"Lettura non riuscita. Inserisci i dati a mano.":"Non riesco ad aprire il PDF ("+((e&&(e.message||e.type))||"errore")+"). Fai una schermata della bolletta e caricala come immagine, oppure inserisci i dati a mano."));
+  }).then(function(){btn.disabled=false});
+}
+
+var NOREAD="La lettura automatica funziona solo se apri la pagina dentro Claude (app o claude.ai), non da un link esterno o da un'anteprima. Per ora inserisci i dati a mano.";
+function readOk(){return !!(sample&&limits&&limits.images)||!!READ_API_URL}
+function initRead(){
+  ["l","g"].forEach(function(p){
+    var inp=$(p+"_file");
+    inp.addEventListener("change",function(){
+      $(p+"_read").disabled=!inp.files.length;
+      if(inp.files.length&&sample===false&&!READ_API_URL)setStatus(p,"warn",NOREAD); else if(inp.files.length)setStatus(p,"","");
+    });
+    $(p+"_read").addEventListener("click",function(){
+      if(!readOk()){setStatus(p,"warn",NOREAD);return}
+      readBill(p);
+    });
+  });
+  if(!window.claude||!window.claude.use){sample=false;return}
+  window.claude.use("sample").then(function(s){
+    if(!s){sample=false;return}
+    sample=s;
+    return s.limits().then(function(lim){limits=lim;
+      if(!lim.images){NOREAD="La lettura delle immagini non è abilitata per questa pagina. Per ora inserisci i dati a mano.";sample=false;return}
+      ["l","g"].forEach(function(p){
+        $(p+"_file").accept=lim.images.mediaTypes.concat(["application/pdf",".pdf"]).join(",");
+      });
+    });
+  }).catch(function(){sample=false});
+}
+
+document.addEventListener("input",function(e){
+  if(e.target&&e.target.classList)e.target.classList.remove("letto");
+  calc();
+});
+document.addEventListener("change",calc);
+$("clearExample").addEventListener("click",function(){
+  ["l","g"].forEach(function(p){["cons","consAnn","totAnn","en","fix","tot"].forEach(function(f){$(p+"_"+f).value=""});$(p+"_giorni").value="365";$(p+"_tipo").value="nd"});
+  $("exampleBox").hidden=true;calc();
+});
+function go(n){
+  [1,2,3].forEach(function(i){$("step"+i).classList.toggle("on",i===n)});
+  Array.prototype.forEach.call(document.querySelectorAll(".stp"),function(b){var on=Number(b.getAttribute("data-go"))===n;b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
+  if(n===3)calc();
+  window.scrollTo(0,0);
+}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-go]");if(b)go(Number(b.getAttribute("data-go")))});
+$("newBtn").addEventListener("click",function(){$("clearExample").click();["l","g"].forEach(function(p){setStatus(p,"","");$(p+"_file").value="";$(p+"_read").disabled=true});$("tut").checked=false;go(1)});
+initIndici();renderListino();calc();initRead();
+})();
+</script>
+
+</body></html>
