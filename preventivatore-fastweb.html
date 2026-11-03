@@ -648,7 +648,7 @@ function profiliTesto(){
 }
 
 /* Lettura bollette fuori da Claude: indirizzo del servizio (vedi ISTRUZIONI). Vuoto = non attivo. */
-var READ_API_URL="";
+var READ_API_URL="https://lettura-bollette.andreaspeciale2094.workers.dev";
 function toJpegBase64(blob){
   return createImageBitmap(blob).then(function(bm){
     var sc=Math.min(1,1800/Math.max(bm.width,bm.height)),cv=document.createElement("canvas");
