@@ -1,11 +1,16 @@
 {
+  "id": "./index.html",
   "name": "TecnoSmart Srl",
   "short_name": "TecnoSmart",
   "description": "RUN Giornaliero e Report Dettagliato TecnoSmart",
+  "lang": "it",
+  "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
+  "categories": ["business", "productivity"],
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "icons": [

@@ -108,6 +108,17 @@
   }
   #notifBar button{border:none;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:8px 6px;}
   #notifBar #notifLater{font-size:18px;line-height:1;padding:8px 12px;opacity:.75;}
+  /* Avviso "sei offline": compare in alto quando manca internet. */
+  #offlineBar{
+    position:fixed;top:0;left:0;right:0;z-index:20;display:none;
+    padding:calc(8px + env(safe-area-inset-top, 0px)) 14px 8px;
+    background:#b3261e;color:#fff;text-align:center;font-size:14px;font-weight:700;
+  }
+  #offlineBar.show{display:block;}
+  #retryBtn{
+    display:none;margin-top:10px;border:none;border-radius:999px;background:#ff9800;color:#1a0f00;
+    font:inherit;font-weight:800;font-size:15px;padding:10px 22px;cursor:pointer;
+  }
   #fallback a{
     color:#ff9800;
     font-weight:700;
@@ -126,6 +137,8 @@
         src="https://script.google.com/macros/s/AKfycbwAbKGE3LvDJgiTbNP_j4xHJ3gEpnHsTjOqBfgySaCwW81I6qih4DQCSVBPUk9LDiVb/exec"
         allow="clipboard-read; clipboard-write"></iframe>
 
+<div id="offlineBar" role="status">Sei offline: l'app ha bisogno di internet. Controlla la connessione.</div>
+
 <div id="notifBar"><button type="button" id="notifOn">🔔 Attiva notifiche</button><button type="button" id="notifLater" aria-label="Più tardi">✕</button></div>
 
 <div id="splash">
@@ -136,6 +149,7 @@
   <div id="fallback">
     <p>Se non si carica, <a id="fallbackLink" target="_blank" href="#">apri qui in una nuova scheda</a>.</p>
   </div>
+  <button type="button" id="retryBtn">Riprova</button>
 </div>
 
 <script>
@@ -173,6 +187,26 @@
   setTimeout(function(){
     fallback.style.display = 'block';
   }, 4000);
+
+  // Avviso "sei offline" (barra rossa in alto) e pulsante "Riprova" nella schermata di apertura.
+  var offlineBar = document.getElementById('offlineBar');
+  var retryBtn = document.getElementById('retryBtn');
+  var splashMsg = document.querySelector('#splash p');
+  function updateOnline() {
+    var off = (navigator.onLine === false);
+    offlineBar.classList.toggle('show', off);
+    if (off && splash.style.display !== 'none') {
+      splashMsg.textContent = 'Sei offline. Controlla la connessione e riprova.';
+      retryBtn.style.display = 'inline-block';
+    }
+  }
+  retryBtn.addEventListener('click', function(){ location.reload(); });
+  window.addEventListener('offline', updateOnline);
+  window.addEventListener('online', function(){
+    updateOnline();
+    if (splash.style.display !== 'none') location.reload(); // era rimasto in attesa: riparte da solo
+  });
+  updateOnline();
 
   // Service worker: lo stesso file sw.js serve sia per l'installazione sia per
   // le notifiche (dentro importa quello di OneSignal). Lo registra OneSignal;
