@@ -221,6 +221,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <div class="f"><label class="lbl" for="l_cons">Consumo del periodo (kWh)</label><input id="l_cons" inputmode="decimal" value="2100"></div>
         <div class="f"><label class="lbl" for="l_consAnn">Consumo annuo in bolletta (kWh)</label><input id="l_consAnn" inputmode="decimal" placeholder="se presente"></div>
         <div class="f"><label class="lbl" for="l_totAnn">Spesa annua in bolletta (€)</label><input id="l_totAnn" inputmode="decimal" placeholder="se presente"><div class="hint">Informazioni storiche, IVA compresa</div></div>
+        <div class="f full"><span class="lbl">Consumi per fascia nel periodo (kWh), se la bolletta li riporta</span><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><input id="l_f1" inputmode="decimal" placeholder="F1" aria-label="Consumo F1 in kWh"><input id="l_f2" inputmode="decimal" placeholder="F2" aria-label="Consumo F2 in kWh"><input id="l_f3" inputmode="decimal" placeholder="F3" aria-label="Consumo F3 in kWh"></div><div class="hint">Con le fasce il prezzo WindTre si calcola sul PUN di ogni fascia. Senza, uso il PUN medio H24.</div></div>
         <div class="f"><label class="lbl" for="l_en">Quota energia (€)</label><input id="l_en" inputmode="decimal" value="560,00"><div class="hint">Materia energia, solo consumi, tutte le fasce</div></div>
         <div class="f"><label class="lbl" for="l_fix">Quota fissa (€)</label><input id="l_fix" inputmode="decimal" value="160,00"><div class="hint">Commercializzazione/vendita del periodo</div></div>
         <div class="f"><label class="lbl" for="l_tot">Totale per i consumi (€)</label><input id="l_tot" inputmode="decimal" value="1150,00"><div class="hint">Tutto compreso, senza canone TV</div></div>
@@ -271,6 +272,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div class="fields">
         <div class="f"><label class="lbl" for="p_pun">PUN previsto (€/kWh)</label><input id="p_pun" inputmode="decimal" value="0,214"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
         <div class="f"><label class="lbl" for="p_psv">PSV previsto (€/Smc)</label><input id="p_psv" inputmode="decimal" value="0,857"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
+        <div class="f"><label class="lbl" for="p_f1">PUN fascia F1 (€/kWh)</label><input id="p_f1" inputmode="decimal"><div class="hint">Usato se la bolletta ha i consumi per fascia</div></div>
+        <div class="f"><label class="lbl" for="p_f2">PUN fascia F2 (€/kWh)</label><input id="p_f2" inputmode="decimal"></div>
+        <div class="f"><label class="lbl" for="p_f3">PUN fascia F3 (€/kWh)</label><input id="p_f3" inputmode="decimal"></div>
         <div class="f"><label class="lbl" for="p_perd">Perdite di rete sulla luce (%)</label><input id="p_perd" inputmode="decimal" value="10,2"><div class="hint">Da verificare con WindTre</div></div>
         <div class="f"><label class="lbl" for="p_disp">Dispacciamento luce (€/kWh)</label><input id="p_disp" inputmode="decimal" value="0,017"><div class="hint">Il canvass lo cita tra gli altri oneri senza dare il valore</div></div>
       </div>
@@ -320,31 +324,33 @@ var L={
   }
 };
 /* INDICI DI MERCATO: la riga qui sotto e' aggiornata ogni mattina da un'attivita' programmata. Non cambiare il formato. */
-var INDICI={fonte:"tabella PUN (H24) e PSV del punto vendita",aggiornato:"2026-11-03",mesi:{"2026-09":{pun:0.207542,psv:0.843182},"2026-10":{pun:0.230817,psv:0.945436}}};
+var INDICI={fonte:"tabella PUN (H24 e fasce F1, F2, F3) e PSV del punto vendita",aggiornato:"2026-11-03",mesi:{"2026-09":{pun:0.207542,psv:0.843182,f1:0.20635,f2:0.227576,f3:0.197024},"2026-10":{pun:0.230817,psv:0.945436,f1:0.23339,f2:0.252135,f3:0.215884}}};
 function giorniDa(s){var p=s.split("-"),d=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));return Math.floor((Date.now()-d.getTime())/86400000)}
 var MESI_IT=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 function chiaveMese(off){var d=new Date(),y=d.getFullYear(),m=d.getMonth()+1-off;while(m<1){m+=12;y--}return y+"-"+String(m).padStart(2,"0")}
 function nomeMese(k){var p=k.split("-");return MESI_IT[Number(p[1])-1]+" "+p[0]}
 function r6(x){return Math.round(x*1e6)/1e6}
+function med(x,y){return (x==null||y==null)?null:(x+y)/2}
 function indiciPer(){
   var k1=chiaveMese(1),k2=chiaveMese(2),a=INDICI.mesi[k1],b=INDICI.mesi[k2];
   if($("per_m").checked){
     if(!a)return {mens:true,manca:[nomeMese(k1)]};
-    return {pun:a.pun,psv:a.psv,mens:true,et:"mese precedente ("+nomeMese(k1)+")"};
+    return {pun:a.pun,psv:a.psv,f1:a.f1,f2:a.f2,f3:a.f3,mens:true,et:"mese precedente ("+nomeMese(k1)+")"};
   }
   var man=[];if(!a)man.push(nomeMese(k1));if(!b)man.push(nomeMese(k2));
   if(man.length)return {mens:false,manca:man};
-  return {pun:(a.pun+b.pun)/2,psv:(a.psv+b.psv)/2,mens:false,et:"media dei due mesi precedenti ("+nomeMese(k2)+" e "+nomeMese(k1)+")"};
+  return {pun:(a.pun+b.pun)/2,psv:(a.psv+b.psv)/2,f1:med(a.f1,b.f1),f2:med(a.f2,b.f2),f3:med(a.f3,b.f3),mens:false,et:"media dei due mesi precedenti ("+nomeMese(k2)+" e "+nomeMese(k1)+")"};
 }
 function applyIndici(){
   var v=indiciPer();
   if(v.manca){
-    $("p_pun").value="";$("p_psv").value="";
+    $("p_pun").value="";$("p_psv").value="";$("p_f1").value="";$("p_f2").value="";$("p_f3").value="";
     $("indiciInfo").textContent="Mancano PUN e PSV di "+v.manca.join(" e ")+" nella tabella. Scrivili a mano qui sotto, oppure aggiungi il mese alla tabella.";
     return;
   }
   $("p_pun").value=String(r6(v.pun)).replace(".",",");
   $("p_psv").value=String(r6(v.psv)).replace(".",",");
+  [["p_f1",v.f1],["p_f2",v.f2],["p_f3",v.f3]].forEach(function(x){$(x[0]).value=(x[1]==null)?"":String(r6(x[1])).replace(".",",")});
   $("indiciInfo").textContent="Bolletta "+(v.mens?"mensile":"bimestrale")+": "+v.et+". PUN "+n3(r6(v.pun),6)+" €/kWh · PSV "+n3(r6(v.psv),6)+" €/Smc. Fonte: "+INDICI.fonte+" (aggiornata il "+itDate(INDICI.aggiornato)+").";
 }
 function setPer(v){$("per_"+v).checked=true;applyIndici()}
@@ -369,7 +375,7 @@ function cfg(){
   var cl=document.querySelector('input[name="cliente"]:checked').value;
   var st=document.querySelector('input[name="sit"]:checked').value;
   return {cliente:cl,sit:cl==="biz"?"new":st,telco:$("telco").checked,tut:$("tut").checked,
-    pun:num($("p_pun").value),psv:num($("p_psv").value),perd:num($("p_perd").value),disp:num($("p_disp").value)};
+    pun:num($("p_pun").value),psv:num($("p_psv").value),f1:num($("p_f1").value),f2:num($("p_f2").value),f3:num($("p_f3").value),perd:num($("p_perd").value),disp:num($("p_disp").value)};
 }
 function pick(c){
   if(c.cliente==="biz")return {o:L.off.micro};
@@ -382,23 +388,26 @@ function readSvc(p){
       totAnnIn=num($(p+"_totAnn").value),
       en=num($(p+"_en").value),fix=num($(p+"_fix").value),tot=num($(p+"_tot").value);
   if(!isFinite(fix))fix=0;
+  var fx=(p==="l")?[num($("l_f1").value),num($("l_f2").value),num($("l_f3").value)]:null;
   if(!(giorni>0)||!(cons>0)||!(en>=0)||(!(tot>0)&&!(totAnnIn>0)))return null;
   var f=365/giorni,consA=consAnn>0?consAnn:cons*f,prezzo=en/cons;
   var mesiEsatti=giorni/30.4167,mesi=Math.abs(giorni-Math.round(mesiEsatti)*30.4167)<=4&&Math.round(mesiEsatti)>0?Math.round(mesiEsatti):mesiEsatti;
   var matEn=prezzo*consA,matFix=fix/mesi*12;
   return {f:f,giorni:giorni,cons:consA,totAnn:r2(totAnnIn>0?totAnnIn:tot*f),matEn:matEn,matFix:matFix,mat:matEn+matFix,
-    prezzo:prezzo,enP:en,fixP:fix,consP:cons,fissaMese:fix/mesi,annualizzato:giorni!==365&&!(consAnn>0)};
+    prezzo:prezzo,enP:en,fixP:fix,consP:cons,fissaMese:fix/mesi,annualizzato:giorni!==365&&!(consAnn>0),fasce:(fx&&fx[0]>=0&&fx[1]>=0&&fx[2]>=0&&(fx[0]+fx[1]+fx[2])>0)?fx:null};
 }
 
 /* Nuova spesa annua con l'offerta WindTre: stima, perche' PUN e PSV cambiano ogni mese. */
 function svcOffer(kind,s,c,o){
   var p=o[kind],u=kind==="luce"?"kWh":"Smc";
-  var idx=kind==="luce"?c.pun:c.psv,base=idx+p.spread,unit,iva;
+  var idx=kind==="luce"?c.pun:c.psv,pes=null;
+  if(kind==="luce"&&s.fasce&&c.f1>0&&c.f2>0&&c.f3>0){var ft=s.fasce[0]+s.fasce[1]+s.fasce[2];idx=(s.fasce[0]*c.f1+s.fasce[1]*c.f2+s.fasce[2]*c.f3)/ft;pes=[s.fasce[0]/ft,s.fasce[1]/ft,s.fasce[2]/ft]}
+  var base=idx+p.spread,unit,iva;
   if(kind==="luce"){unit=base*(1+c.perd/100)+c.disp;iva=c.cliente==="biz"?L.iva.bizLuce:L.iva.domLuce}
   else{unit=base;iva=c.cliente==="biz"?L.iva.bizGas:effIvaDom(s.cons)}
   var nuova=s.cons*unit+p.fisso;
   var tot=r2(s.totAnn+(nuova-s.mat)*(1+iva));
-  var lines=[[(kind==="luce"?"PUN":"PSV")+" previsto + corrispettivo ("+n3(idx,4)+" + "+n3(p.spread,4)+")",n3(base,4)+" €/"+u]];
+  var lines=[[(kind==="luce"?(pes?"PUN pesato sulle fasce (F1 "+Math.round(pes[0]*100)+"%, F2 "+Math.round(pes[1]*100)+"%, F3 "+Math.round(pes[2]*100)+"%)":"PUN medio H24"):"PSV")+" + corrispettivo ("+n3(idx,4)+" + "+n3(p.spread,4)+")",n3(base,4)+" €/"+u]];
   if(kind==="luce")lines.push(["Con perdite di rete e dispacciamento",n3(unit,4)+" €/"+u]);
   lines.push([(kind==="luce"?"Energia: ":"Gas: ")+n3(s.cons,0)+" "+u,eur(r2(s.cons*unit))],
     ["Contributo fisso annuo",eur(p.fisso)],["Nuova materia (senza IVA)",eur(r2(nuova))],
@@ -606,16 +615,18 @@ function readBill(p){
   var kind=p==="l"?"luce":"gas";
   var btn=$(p+"_read");btn.disabled=true;setStatus(p,"","Lettura in corso, può richiedere fino a un minuto...");
   var unit=kind==="luce"?"kWh":"Smc";
-  var prompt='Le immagini sono la bolletta '+(kind==="luce"?"della luce (energia elettrica)":"del gas")+' di un cliente italiano. Leggi i dati e rispondi solo con un oggetto JSON con queste chiavi. Usa numeri con il punto decimale. Scrivi null quando un dato non è chiaramente leggibile e non indovinare mai.\nMODELLO BASE (vale per tutti i gestori, luce e gas, bollette da luglio 2025, struttura imposta da ARERA): la prima parte è il frontespizio con il totale da pagare; poi lo "Scontrino dell\'energia" con le righe "Quota per consumi", "Quota fissa" e (solo luce) "Quota potenza"; ogni quota è divisa in "di cui spesa per la vendita" e "di cui spesa per la rete e gli oneri generali di sistema". Il confronto riguarda SOLO la parte "vendita": quota_energia = "spesa per la vendita" della Quota per consumi; quota_fissa = "spesa per la vendita" della Quota fissa. Mai usare le parti rete/oneri e mai la quota potenza. Il "Box dell\'offerta" riporta "Totale di spesa dovuto per l\'offerta" con il "di cui quota fissa" e il "di cui quota consumi": serve per controllare che quota_energia + quota_fissa coincidano. Consumo annuo e "Spesa annua" (esclude canone TV e altre partite) sono nelle "Informazioni storiche" o nel riquadro "consumo annuo" del frontespizio. Se la bolletta è precedente a luglio 2025 non ha lo scontrino: cerca nel riepilogo la "Spesa per la materia energia/gas" divisa in quota energia (consumi) e quota fissa (commercializzazione), senza trasporto, oneri e imposte. Il consumo e le spese sono del periodo fatturato di questa bolletta.\nMODELLI NOTI PER GESTORE (usali solo se il fornitore coincide e il servizio è lo stesso):\n'+profiliTesto()+'\nPer gli altri gestori cerca le stesse voci con il criterio generale sopra.\n{"giorni_periodo": giorni del periodo fatturato (dal "Periodo di riferimento"),\n"consumo_periodo": '+unit+' fatturati nel periodo,\n"consumo_annuo": consumo annuo in '+unit+' dalle "Informazioni storiche" o dal riquadro consumo annuo (totale di tutte le fasce), altrimenti null,\n"spesa_annua": "Spesa annua sostenuta" (IVA compresa) delle informazioni storiche, altrimenti null,\n"quota_energia": euro della "spesa per la vendita" riferita alla quota consumi (somma di tutte le fasce, senza quota fissa),\n"quota_fissa": euro della "spesa per la vendita" riferita alla quota fissa (commercializzazione/vendita del periodo; NON la quota potenza e NON la parte rete e oneri),\n"totale_senza_canone_tv": euro del "Totale bolletta" o totale dei consumi, PRIMA di aggiungere il canone TV,\n"canone_tv": euro di canone TV addebitato nel periodo, altrimenti null,\n"totale_da_pagare": totale da pagare riportato in prima pagina,\n"prezzo_energia": prezzo unitario di vendita in euro per '+unit+' se riportato, altrimenti null,\n"potenza_kw": potenza impegnata in kW oppure null,\n"fornitore": nome del fornitore,\n"tipo_offerta": "fisso" o "indicizzato" se indicato nel Box dell\'offerta, altrimenti null,\n"mercato": "libero" oppure "tutele graduali" se indicato nel frontespizio (pagina 1), altrimenti null,\n"note": una frase su cosa è poco leggibile, oppure null}\nNon includere ricalcoli, arretrati, interessi o altri addebiti.';
+  var prompt='Le immagini sono la bolletta '+(kind==="luce"?"della luce (energia elettrica)":"del gas")+' di un cliente italiano. Leggi i dati e rispondi solo con un oggetto JSON con queste chiavi. Usa numeri con il punto decimale. Scrivi null quando un dato non è chiaramente leggibile e non indovinare mai.\nMODELLO BASE (vale per tutti i gestori, luce e gas, bollette da luglio 2025, struttura imposta da ARERA): la prima parte è il frontespizio con il totale da pagare; poi lo "Scontrino dell\'energia" con le righe "Quota per consumi", "Quota fissa" e (solo luce) "Quota potenza"; ogni quota è divisa in "di cui spesa per la vendita" e "di cui spesa per la rete e gli oneri generali di sistema". Il confronto riguarda SOLO la parte "vendita": quota_energia = "spesa per la vendita" della Quota per consumi; quota_fissa = "spesa per la vendita" della Quota fissa. Mai usare le parti rete/oneri e mai la quota potenza. Il "Box dell\'offerta" riporta "Totale di spesa dovuto per l\'offerta" con il "di cui quota fissa" e il "di cui quota consumi": serve per controllare che quota_energia + quota_fissa coincidano. Consumo annuo e "Spesa annua" (esclude canone TV e altre partite) sono nelle "Informazioni storiche" o nel riquadro "consumo annuo" del frontespizio. Se la bolletta è precedente a luglio 2025 non ha lo scontrino: cerca nel riepilogo la "Spesa per la materia energia/gas" divisa in quota energia (consumi) e quota fissa (commercializzazione), senza trasporto, oneri e imposte. Il consumo e le spese sono del periodo fatturato di questa bolletta.\nMODELLI NOTI PER GESTORE (usali solo se il fornitore coincide e il servizio è lo stesso):\n'+profiliTesto()+'\nPer gli altri gestori cerca le stesse voci con il criterio generale sopra.\n{"giorni_periodo": giorni del periodo fatturato (dal "Periodo di riferimento"),\n"consumo_periodo": '+unit+' fatturati nel periodo,\n"consumo_f1": solo per la luce, kWh fatturati nel periodo in fascia F1 se la bolletta riporta i consumi per fascia, altrimenti null,\n"consumo_f2": come sopra per la fascia F2, altrimenti null,\n"consumo_f3": come sopra per la fascia F3, altrimenti null,\n"consumo_annuo": consumo annuo in '+unit+' dalle "Informazioni storiche" o dal riquadro consumo annuo (totale di tutte le fasce), altrimenti null,\n"spesa_annua": "Spesa annua sostenuta" (IVA compresa) delle informazioni storiche, altrimenti null,\n"quota_energia": euro della "spesa per la vendita" riferita alla quota consumi (somma di tutte le fasce, senza quota fissa),\n"quota_fissa": euro della "spesa per la vendita" riferita alla quota fissa (commercializzazione/vendita del periodo; NON la quota potenza e NON la parte rete e oneri),\n"totale_senza_canone_tv": euro del "Totale bolletta" o totale dei consumi, PRIMA di aggiungere il canone TV,\n"canone_tv": euro di canone TV addebitato nel periodo, altrimenti null,\n"totale_da_pagare": totale da pagare riportato in prima pagina,\n"prezzo_energia": prezzo unitario di vendita in euro per '+unit+' se riportato, altrimenti null,\n"potenza_kw": potenza impegnata in kW oppure null,\n"fornitore": nome del fornitore,\n"tipo_offerta": "fisso" o "indicizzato" se indicato nel Box dell\'offerta, altrimenti null,\n"mercato": "libero" oppure "tutele graduali" se indicato nel frontespizio (pagina 1), altrimenti null,\n"note": una frase su cosa è poco leggibile, oppure null}\nNon includere ricalcoli, arretrati, interessi o altri addebiti.';
   prepImages(files,(limits&&limits.images)?limits.images.maxCount:6).then(function(imgs){return askBill(prompt,imgs)}).then(function(d){
     var ok=[];
     function put(id,v,dec){if(v!=null&&isFinite(Number(v))){$(id).value=String(Number(v).toFixed(dec)).replace(".",",");ok.push(id)}}
     put(p+"_giorni",d.giorni_periodo,0);put(p+"_cons",d.consumo_periodo,0);
     if(d.giorni_periodo!=null){var gp=Number(d.giorni_periodo);if(gp>=25&&gp<=35)setPer("m");else if(gp>=55&&gp<=70)setPer("b")}
+    if(kind==="luce"){put("l_f1",d.consumo_f1,0);put("l_f2",d.consumo_f2,0);put("l_f3",d.consumo_f3,0)}
     if(d.consumo_annuo!=null)put(p+"_consAnn",d.consumo_annuo,0);
     put(p+"_en",d.quota_energia,2);put(p+"_fix",d.quota_fissa,2);
     if(d.spesa_annua!=null)put(p+"_totAnn",d.spesa_annua,2);
     var warn=[];
+    if(kind==="luce"&&(d.consumo_f1==null||d.consumo_f2==null||d.consumo_f3==null))warn.push("consumi per fascia non trovati: uso il PUN medio H24");
     var tsc=d.totale_senza_canone_tv;
     if(tsc==null&&d.totale_da_pagare!=null)tsc=Number(d.totale_da_pagare)-(Number(d.canone_tv)||0);
     if(tsc!=null)put(p+"_tot",tsc,2);else warn.push("totale della bolletta non letto");
@@ -670,6 +681,7 @@ document.addEventListener("input",function(e){
 document.addEventListener("change",calc);
 $("clearExample").addEventListener("click",function(){
   ["l","g"].forEach(function(p){["cons","consAnn","totAnn","en","fix","tot"].forEach(function(f){$(p+"_"+f).value=""});$(p+"_giorni").value="365";$(p+"_tipo").value="nd"});
+  ["l_f1","l_f2","l_f3"].forEach(function(id){$(id).value=""});
   $("exampleBox").hidden=true;calc();
 });
 function go(n){
