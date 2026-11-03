@@ -71,6 +71,7 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
 .pr{color:#c4b5fd!important;font-weight:600;margin-top:6px}
 .pr2{display:flex;gap:8px;margin-top:8px}
 .pr2 input{font-size:15px;padding:8px;flex:1;min-width:0}
+.mini.del{background:#3a1d24;color:#f87171;margin:10px 0 0;padding:10px 14px}
 .mini{border:0;border-radius:9px;background:#1a2942;color:#fff;font-size:14px;font-weight:600;padding:8px 10px;margin-left:6px}
 .pick{position:relative;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:#1a2942}
 .pick::after{content:"▾";color:#4da3ff;font-size:14px}
@@ -86,7 +87,7 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
   <input id="azienda" type="text" placeholder="Es. Rossi Srl" autocomplete="off">
   <label>Sede di attivazione</label>
   <input id="sede" type="text" placeholder="Es. Via Roma 12, Milano" style="font-size:18px" autocomplete="off">
-  <label>Tipo di contratto</label>
+  <label>Tipo di contratto <span style="color:#4da3ff">(puoi sceglierne più di uno)</span></label>
   <div class="esiti" id="tipi"></div>
   <label>Nota (facoltativa)</label>
   <input id="nota" type="text" placeholder="Es. cliente già contattato" style="font-size:18px" autocomplete="off">
@@ -105,12 +106,12 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
 <div class="ov" id="ov" hidden><div class="box"><h2>🔔 Clienti da richiamare</h2><p>È passato il periodo dal contratto. Chiamali per proporre un rinnovo o una nuova offerta.</p><div id="ovl"></div><button class="chiudi" id="chiudi">Chiudi</button></div></div>
 <div class="ov" id="ana" hidden><div class="box"><h2>📇 Anagrafiche</h2><p>Tocca un cliente per vedere cosa ha firmato e quando.</p>
 <input id="cerca" class="cerca" type="search" placeholder="Cerca azienda..." autocomplete="off"><div id="anal"></div><button class="chiudi" id="chiudiAna">Chiudi</button></div></div>
-<p class="ver">Versione 6 · CB e PROTECTA</p>
+<p class="ver">Versione 7 · CB, PROTECTA, nessuna preselezione</p>
 
 <script>
 var TIPI=["FISSO + SECONDA LINEA","MOBILE/DATA","MOBILE + TEL","LUCE E GAS","CB","PROTECTA"];
 var KEY="tecnosmart_promoter_v1";
-var tipo="",giorno=new Date();
+var sel=[],giorno=new Date();
 function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
 function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert("Impossibile salvare su questo telefono")}}
 var MESI={"FISSO + SECONDA LINEA":6,"LUCE E GAS":6,"MOBILE/DATA":24,"MOBILE + TEL":36,"CB":24};
@@ -119,6 +120,7 @@ function richiamo(x){return MESI[x.tipo]?addMesi(x.data,MESI[x.tipo]):null}
 function giorniTra(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)}
 function dovuti(){var o=oggi(),r=[];
   carica().forEach(function(x){
+    if(x.anaOff)return;
     if(x.prom&&!x.promFatto&&x.prom<=o&&!(x.promRimanda&&x.promRimanda>o))r.push({x:x,k:"p",d:x.prom});
     if(!x.fatto&&richiamo(x)&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o))r.push({x:x,k:"a",d:richiamo(x)})});
   return r.sort(function(a,b){return a.d<b.d?-1:1})}
@@ -135,7 +137,7 @@ function apriAvviso(){var d=dovuti(),ov=document.getElementById("ov");
     else{var d7=tra(7);aggiorna(b.dataset.id,function(x){if(p)x.promRimanda=d7;else x.rimanda=d7})}}})}
 function fdl(s){return s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4)}
 function chiaveCli(n){return n.trim().toLowerCase().replace(/\s+/g," ")}
-function clienti(){var m={};carica().forEach(function(x){var k=chiaveCli(x.azienda);if(!m[k])m[k]={nome:x.azienda.trim(),c:[]};m[k].c.push(x)});
+function clienti(){var m={};carica().forEach(function(x){if(x.anaOff)return;var k=chiaveCli(x.azienda);if(!m[k])m[k]={nome:x.azienda.trim(),c:[]};m[k].c.push(x)});
   return Object.keys(m).map(function(k){m[k].c.sort(function(a,b){return a.data<b.data?1:-1});return m[k]}).sort(function(a,b){return a.nome.toLowerCase()<b.nome.toLowerCase()?-1:1})}
 function promBox(x){
   if(x.prom&&!x.promFatto)return '<small class="pr">⏰ Promemoria il '+fdl(x.prom)+' <button class="mini" data-pa="t" data-id="'+x.id+'">Togli</button></small>';
@@ -144,11 +146,15 @@ function disegnaAna(){var q=chiaveCli(document.getElementById("cerca").value),l=
   l.forEach(function(c){if(q&&chiaveCli(c.nome).indexOf(q)<0)return;n++;
     h+='<details class="cli"><summary><span>'+esc(c.nome)+'</span><i>'+c.c.length+(c.c.length===1?" contratto":" contratti")+'</i></summary><div class="ct">';
     c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+(richiamo(x)?'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small>':'')+promBox(x)+'</div>'});
-    h+='</div></details>'});
+    h+='<button class="mini del" data-del="'+esc(chiaveCli(c.nome))+'" data-nome="'+esc(c.nome)+'">🗑 Elimina anagrafica</button></div></details>'});
   var al=document.getElementById("anal");al.innerHTML=h||'<div class="vuoto">'+(q?"Nessun cliente trovato":"Ancora nessun cliente")+'</div>';
   al.querySelectorAll("[data-pa]").forEach(function(b){b.onclick=function(e){e.preventDefault();e.stopPropagation();var id=b.dataset.id;
     if(b.dataset.pa==="t"){aggiorna2(id,function(x){x.prom="";x.promFatto=""})}
     else{var v=al.querySelector('[data-pd="'+id+'"]').value;if(!v||v<oggi()){alert("Scegli una data da oggi in poi");return}aggiorna2(id,function(x){x.prom=v;x.promFatto="";x.promRimanda=""})}}});
+  al.querySelectorAll("[data-del]").forEach(function(b){b.onclick=function(e){e.preventDefault();e.stopPropagation();var k=b.dataset.del;
+    if(!confirm("Eliminare l'anagrafica di «"+b.dataset.nome+"»?\n\nIl cliente sparisce da qui e dai promemoria. I contratti restano nei conteggi di giorno, mese e anno."))return;
+    var t=carica(),o=oggi();t.forEach(function(x){if(chiaveCli(x.azienda)===k)x.anaOff=o});salva(t);disegna();disegnaAna();
+    if(!document.getElementById("ov").hidden)apriAvviso()}});
   al.querySelectorAll("input[data-pd]").forEach(function(i){i.onclick=function(e){e.stopPropagation()}})}
 function aggiorna2(id,mod){var ap=[];document.querySelectorAll("#anal details[open] summary span").forEach(function(e){ap.push(e.textContent)});
   var t=carica();t.forEach(function(x){if(String(x.id)===String(id))mod(x)});salva(t);disegna();disegnaAna();
@@ -171,8 +177,9 @@ function elenco(v){
 function disegnaTipi(){
   var el=document.getElementById("tipi");el.innerHTML="";
   TIPI.forEach(function(e){var b=document.createElement("button");b.textContent=e;
-    if(e===tipo)b.className="on";
-    b.onclick=function(){tipo=e;disegnaTipi()};el.appendChild(b)})}
+    var on=sel.indexOf(e)>=0;b.textContent=(on?"✓ ":"")+e;b.setAttribute("aria-pressed",on?"true":"false");
+    if(on)b.className="on";
+    b.onclick=function(){var i=sel.indexOf(e);if(i>=0)sel.splice(i,1);else sel.push(e);disegnaTipi();disegna()};el.appendChild(b)})}
 function disegna(){
   var t=carica(),g=iso(giorno),y=g.slice(0,4),m=g.slice(0,7);
   var dv=t.filter(function(x){return x.data===g}),mv=t.filter(function(x){return x.data.slice(0,7)===m}),av=t.filter(function(x){return x.data.slice(0,4)===y});
@@ -192,15 +199,16 @@ function disegna(){
   var ap=document.getElementById("apick"),cy=new Date().getFullYear(),miny=cy-3;t.forEach(function(x){var yy=+x.data.slice(0,4);if(yy<miny)miny=yy});
   var oh="";for(var yy=cy;yy>=miny;yy--)oh+='<option value="'+yy+'"'+(String(yy)===y?' selected':'')+'>'+yy+'</option>';ap.innerHTML=oh;
   var nd=dovuti().length,bd=document.getElementById("badge");bd.hidden=!nd;bd.textContent="🔔 "+nd+(nd===1?" cliente da richiamare":" clienti da richiamare");
-  document.getElementById("add").textContent="+ Aggiungi contratto"+(g===oggi()?"":" · "+nomeG(giorno));
+  document.getElementById("add").textContent=(sel.length>1?"+ Aggiungi "+sel.length+" contratti":"+ Aggiungi contratto")+(g===oggi()?"":" · "+nomeG(giorno));
 }
 document.getElementById("add").onclick=function(){
   var a=document.getElementById("azienda").value.trim();
   if(!a){alert("Scrivi la denominazione dell'azienda");return}
-  if(!tipo){alert("Scegli il tipo di contratto");return}
   var pd=document.getElementById("promdata").value;if(pd&&pd<oggi()){alert("La data del promemoria deve essere da oggi in poi");return}
-  var t=carica();t.push({id:Date.now(),data:iso(giorno),azienda:a,prom:document.getElementById("promdata").value||"",sede:document.getElementById("sede").value.trim(),tipo:tipo,nota:document.getElementById("nota").value.trim()});
-  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";document.getElementById("promdata").value="";segnaChip(0);tipo="";disegnaTipi();disegna()};
+  if(!sel.length){alert("Scegli almeno un tipo di contratto");return}
+  var t=carica(),id0=Date.now(),pr=document.getElementById("promdata").value||"",se=document.getElementById("sede").value.trim(),no=document.getElementById("nota").value.trim();
+  TIPI.filter(function(e){return sel.indexOf(e)>=0}).forEach(function(e,i){t.push({id:id0+i,data:iso(giorno),azienda:a,prom:i===0?pr:"",sede:se,tipo:e,nota:no})});
+  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";document.getElementById("promdata").value="";segnaChip(0);sel=[];disegnaTipi();disegna()};
 function sposta(dy,dm,dd){var t=new Date(),y=giorno.getFullYear()+dy,m=giorno.getMonth()+dm,d=giorno.getDate()+dd;
   var ult=new Date(y,m+1,0).getDate(),n=new Date(y,m,dd?d:Math.min(giorno.getDate(),ult));
   if(n>t){if(dy>0||dm>0||dd>0)return;n=t}
