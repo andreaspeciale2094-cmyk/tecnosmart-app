@@ -105,22 +105,22 @@ h3{margin:18px 0 4px;font-size:15px;color:#94a3b8}
 <div class="ov" id="ov" hidden><div class="box"><h2>🔔 Clienti da richiamare</h2><p>È passato il periodo dal contratto. Chiamali per proporre un rinnovo o una nuova offerta.</p><div id="ovl"></div><button class="chiudi" id="chiudi">Chiudi</button></div></div>
 <div class="ov" id="ana" hidden><div class="box"><h2>📇 Anagrafiche</h2><p>Tocca un cliente per vedere cosa ha firmato e quando.</p>
 <input id="cerca" class="cerca" type="search" placeholder="Cerca azienda..." autocomplete="off"><div id="anal"></div><button class="chiudi" id="chiudiAna">Chiudi</button></div></div>
-<p class="ver">Versione 5 · cambio data</p>
+<p class="ver">Versione 6 · CB e PROTECTA</p>
 
 <script>
-var TIPI=["FISSO + SECONDA LINEA","MOBILE/DATA","MOBILE + TEL","LUCE E GAS"];
+var TIPI=["FISSO + SECONDA LINEA","MOBILE/DATA","MOBILE + TEL","LUCE E GAS","CB","PROTECTA"];
 var KEY="tecnosmart_promoter_v1";
-var tipo=TIPI[0],giorno=new Date();
+var tipo="",giorno=new Date();
 function carica(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
 function salva(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){alert("Impossibile salvare su questo telefono")}}
-var MESI={"FISSO + SECONDA LINEA":6,"LUCE E GAS":6,"MOBILE/DATA":24,"MOBILE + TEL":36};
+var MESI={"FISSO + SECONDA LINEA":6,"LUCE E GAS":6,"MOBILE/DATA":24,"MOBILE + TEL":36,"CB":24};
 function addMesi(d,n){var y=+d.slice(0,4),m=+d.slice(5,7)-1+n,g=+d.slice(8,10),ult=new Date(y,m+1,0).getDate();return iso(new Date(y,m,Math.min(g,ult)))}
-function richiamo(x){return addMesi(x.data,MESI[x.tipo]||6)}
+function richiamo(x){return MESI[x.tipo]?addMesi(x.data,MESI[x.tipo]):null}
 function giorniTra(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)}
 function dovuti(){var o=oggi(),r=[];
   carica().forEach(function(x){
     if(x.prom&&!x.promFatto&&x.prom<=o&&!(x.promRimanda&&x.promRimanda>o))r.push({x:x,k:"p",d:x.prom});
-    if(!x.fatto&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o))r.push({x:x,k:"a",d:richiamo(x)})});
+    if(!x.fatto&&richiamo(x)&&richiamo(x)<=o&&!(x.rimanda&&x.rimanda>o))r.push({x:x,k:"a",d:richiamo(x)})});
   return r.sort(function(a,b){return a.d<b.d?-1:1})}
 function aggiorna(id,mod){var t=carica();t.forEach(function(x){if(String(x.id)===String(id))mod(x)});salva(t);disegna();apriAvviso(true)}
 function tra(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
@@ -143,7 +143,7 @@ function promBox(x){
 function disegnaAna(){var q=chiaveCli(document.getElementById("cerca").value),l=clienti(),h="",n=0;
   l.forEach(function(c){if(q&&chiaveCli(c.nome).indexOf(q)<0)return;n++;
     h+='<details class="cli"><summary><span>'+esc(c.nome)+'</span><i>'+c.c.length+(c.c.length===1?" contratto":" contratti")+'</i></summary><div class="ct">';
-    c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small>'+promBox(x)+'</div>'});
+    c.c.forEach(function(x){h+='<div><b>'+esc(x.tipo)+'</b><small>Inserito il '+fdl(x.data)+'</small>'+(x.sede?'<small>Sede: '+esc(x.sede)+'</small>':'')+(x.nota?'<small>Nota: '+esc(x.nota)+'</small>':'')+(richiamo(x)?'<small>Richiamo dal '+fdl(richiamo(x))+(x.fatto?' · già richiamato':'')+'</small>':'')+promBox(x)+'</div>'});
     h+='</div></details>'});
   var al=document.getElementById("anal");al.innerHTML=h||'<div class="vuoto">'+(q?"Nessun cliente trovato":"Ancora nessun cliente")+'</div>';
   al.querySelectorAll("[data-pa]").forEach(function(b){b.onclick=function(e){e.preventDefault();e.stopPropagation();var id=b.dataset.id;
@@ -164,7 +164,7 @@ function righe(v){
   var h="";TIPI.forEach(function(e){h+='<div class="row"><span>'+e+'</span><span>'+c[e]+'</span></div>'});
   return h+'<div class="row tot"><span>Totale contratti</span><span>'+v.length+'</span></div>'}
 function voce(x,conData,conX){
-  return '<div class="voce"><div><b>'+esc(x.azienda)+'</b><small>'+(conData?fd(x.data)+" · ":"")+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?" · "+esc(x.nota):"")+'<br>Richiamo dal '+fd(richiamo(x))+"/"+richiamo(x).slice(2,4)+(x.fatto?" · fatto":"")+(x.prom&&!x.promFatto?'<br>⏰ Promemoria il '+fdl(x.prom):'')+'</small></div>'+(conX?'<button data-id="'+x.id+'" aria-label="Elimina">✕</button>':'')+'</div>'}
+  return '<div class="voce"><div><b>'+esc(x.azienda)+'</b><small>'+(conData?fd(x.data)+" · ":"")+esc(x.tipo)+(x.sede?" · "+esc(x.sede):"")+(x.nota?" · "+esc(x.nota):"")+(richiamo(x)?'<br>Richiamo dal '+fd(richiamo(x))+"/"+richiamo(x).slice(2,4)+(x.fatto?" · fatto":""):"")+(x.prom&&!x.promFatto?'<br>⏰ Promemoria il '+fdl(x.prom):'')+'</small></div>'+(conX?'<button data-id="'+x.id+'" aria-label="Elimina">✕</button>':'')+'</div>'}
 function elenco(v){
   if(!v.length)return"";
   var h='<h3>Elenco contratti</h3>';v.slice().reverse().forEach(function(x){h+=voce(x,true,false)});return h}
@@ -197,9 +197,10 @@ function disegna(){
 document.getElementById("add").onclick=function(){
   var a=document.getElementById("azienda").value.trim();
   if(!a){alert("Scrivi la denominazione dell'azienda");return}
+  if(!tipo){alert("Scegli il tipo di contratto");return}
   var pd=document.getElementById("promdata").value;if(pd&&pd<oggi()){alert("La data del promemoria deve essere da oggi in poi");return}
   var t=carica();t.push({id:Date.now(),data:iso(giorno),azienda:a,prom:document.getElementById("promdata").value||"",sede:document.getElementById("sede").value.trim(),tipo:tipo,nota:document.getElementById("nota").value.trim()});
-  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";document.getElementById("promdata").value="";segnaChip(0);disegna()};
+  salva(t);document.getElementById("azienda").value="";document.getElementById("sede").value="";document.getElementById("nota").value="";document.getElementById("promdata").value="";segnaChip(0);tipo="";disegnaTipi();disegna()};
 function sposta(dy,dm,dd){var t=new Date(),y=giorno.getFullYear()+dy,m=giorno.getMonth()+dm,d=giorno.getDate()+dd;
   var ult=new Date(y,m+1,0).getDate(),n=new Date(y,m,dd?d:Math.min(giorno.getDate(),ult));
   if(n>t){if(dy>0||dm>0||dd>0)return;n=t}
