@@ -209,14 +209,6 @@ details.all>summary{padding:12px 14px;background:var(--surface);border:1px solid
 <div class="stepnav"><button type="button" class="btn big" data-go="2">Avanti: le bollette</button></div>
 </section>
 <section class="step" id="step2" aria-label="Bollette"><h1>Le bollette</h1><p class="sub">Carica il PDF o una foto, oppure scrivi i dati. Il gas si attiva solo con la luce.</p>
-  <section class="panel">
-    <span class="lbl" id="lblPer">La bolletta è</span>
-    <div class="seg" role="radiogroup" aria-labelledby="lblPer">
-      <label><input type="radio" name="per" id="per_m" value="m"><span>Mensile</span></label>
-      <label><input type="radio" name="per" id="per_b" value="b" checked><span>Bimestrale</span></label>
-    </div>
-    <div class="hint" style="margin-top:6px">Mensile: PUN e PSV del mese precedente. Bimestrale: media dei due mesi precedenti.</div>
-  </section>
   <div class="example" id="exampleBox">
     <span><strong>Dati di esempio.</strong> Sostituiscili con quelli della bolletta del cliente.</span>
     <button class="btn small" id="clearExample" type="button">Svuota i campi</button>
@@ -235,6 +227,7 @@ details.all>summary{padding:12px 14px;background:var(--surface);border:1px solid
       </div>
       <div class="fields">
         <div class="f full"><label class="lbl" for="l_giorni">Giorni del periodo fatturato (365 se inserisci i dati di un anno)</label><input id="l_giorni" inputmode="decimal" value="365"></div>
+        <div class="f full"><span class="lbl">Mesi di riferimento della bolletta luce</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div><label class="lbl" for="l_da">Dal mese</label><input id="l_da" type="month" placeholder="AAAA-MM"></div><div><label class="lbl" for="l_a">Al mese</label><input id="l_a" type="month" placeholder="AAAA-MM"></div></div><div class="hint">Letti dalla bolletta: se sono sbagliati, scrivili tu. Bolletta mensile: stesso mese nei due campi. Servono a scegliere il PUN del periodo.</div><div class="note" id="l_perInfo"></div></div>
         <div class="f"><label class="lbl" for="l_cons">Consumo del periodo (kWh)</label><input id="l_cons" inputmode="decimal" value="2100"></div>
         <div class="f"><label class="lbl" for="l_consAnn">Consumo annuo in bolletta (kWh)</label><input id="l_consAnn" inputmode="decimal" placeholder="se presente"></div>
         <div class="f"><label class="lbl" for="l_totAnn">Spesa annua in bolletta (€)</label><input id="l_totAnn" inputmode="decimal" placeholder="se presente"><div class="hint">Informazioni storiche, IVA compresa</div></div>
@@ -257,6 +250,7 @@ details.all>summary{padding:12px 14px;background:var(--surface);border:1px solid
       </div>
       <div class="fields">
         <div class="f full"><label class="lbl" for="g_giorni">Giorni del periodo fatturato (365 se inserisci i dati di un anno)</label><input id="g_giorni" inputmode="decimal" value="365"></div>
+        <div class="f full"><span class="lbl">Mesi di riferimento della bolletta gas</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div><label class="lbl" for="g_da">Dal mese</label><input id="g_da" type="month" placeholder="AAAA-MM"></div><div><label class="lbl" for="g_a">Al mese</label><input id="g_a" type="month" placeholder="AAAA-MM"></div></div><div class="hint">Letti dalla bolletta: se sono sbagliati, scrivili tu. Bolletta mensile: stesso mese nei due campi. Servono a scegliere il PSV del periodo.</div><div class="note" id="g_perInfo"></div></div>
         <div class="f"><label class="lbl" for="g_cons">Consumo del periodo (Smc)</label><input id="g_cons" inputmode="decimal" value="700"></div>
         <div class="f"><label class="lbl" for="g_consAnn">Consumo annuo in bolletta (Smc)</label><input id="g_consAnn" inputmode="decimal" placeholder="se presente"></div>
         <div class="f"><label class="lbl" for="g_totAnn">Spesa annua in bolletta (€)</label><input id="g_totAnn" inputmode="decimal" placeholder="se presente"><div class="hint">Informazioni storiche, IVA compresa</div></div>
@@ -278,10 +272,10 @@ details.all>summary{padding:12px 14px;background:var(--surface);border:1px solid
     <details style="border-top:0;padding-top:0">
       <summary>Parametri di calcolo per le offerte a consumo (FIX e FLEX)</summary>
       <p class="note" id="indiciInfo" style="margin-top:8px"></p>
-      <p class="note" style="margin:8px 0 12px">Le FLAT hanno un canone fisso e il loro importo è esatto. FIX e FLEX dipendono da questi valori, che il canvass non riporta. PUN e PSV di partenza dipendono da come hai scelto la bolletta nel passo 2: mensile = mese precedente, bimestrale = media dei due mesi precedenti. È lo stesso periodo della bolletta che porta il cliente, così il confronto è alla pari. Vengono dalla tabella del punto vendita: ogni mese va aggiunta la riga nuova. Se la bolletta è di un altro periodo, scrivi qui i valori di quel periodo. Per un importo definitivo usa il Preventivatore del Portale Agenti.</p>
+      <p class="note" style="margin:8px 0 12px">Le FLAT hanno un canone fisso e il loro importo è esatto. FIX e FLEX dipendono da questi valori, che il canvass non riporta. PUN e PSV di partenza vengono dai mesi di riferimento della bolletta (passo 2): sono PUN e PSV dello stesso periodo, così il confronto è alla pari. Vengono dalla tabella del punto vendita: ogni mese va aggiunta la riga nuova. Se la bolletta è di un altro periodo, scrivi qui i valori di quel periodo. Per un importo definitivo usa il Preventivatore del Portale Agenti.</p>
       <div class="fields">
-        <div class="f"><label class="lbl" for="p_pun">PUN previsto (€/kWh)</label><input id="p_pun" inputmode="decimal" value="0,24"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
-        <div class="f"><label class="lbl" for="p_psv">PSV previsto (€/Smc)</label><input id="p_psv" inputmode="decimal" value="0,90"><div class="hint">Dipende da bolletta mensile o bimestrale (passo 2)</div></div>
+        <div class="f"><label class="lbl" for="p_pun">PUN previsto (€/kWh)</label><input id="p_pun" inputmode="decimal" value="0,24"><div class="hint">Dai mesi di riferimento della bolletta (passo 2)</div></div>
+        <div class="f"><label class="lbl" for="p_psv">PSV previsto (€/Smc)</label><input id="p_psv" inputmode="decimal" value="0,90"><div class="hint">Dai mesi di riferimento della bolletta (passo 2)</div></div>
         <div class="f"><label class="lbl" for="p_perd">Perdite di rete sulla luce (%)</label><input id="p_perd" inputmode="decimal" value="10,2"></div>
         <div class="f"><label class="lbl" for="p_disp">Dispacciamento luce (€/kWh)</label><input id="p_disp" inputmode="decimal" value="0,017"><div class="hint">Il canvass lo esclude dal prezzo. In bolletta Iren: 0,015 a 0,018</div></div>
       </div>
@@ -316,36 +310,83 @@ var L={
     gas:{iva:0.22,fix:{price:0.80,comm:20,conv:10},flex:{spread:0.13,comm:20,conv:10}}
   }
 };
-/* INDICI DI MERCATO: PUN (H24, €/kWh) e PSV (€/Smc) medi di ogni mese, dalla tabella del punto vendita. Per aggiungere un mese basta una riga nuova in "mesi", con la chiave AAAA-MM. */
-var INDICI={fonte:"tabella PUN (H24) e PSV del punto vendita",aggiornato:"2026-11-03",mesi:{"2026-09":{pun:0.207542,psv:0.843182},"2026-10":{pun:0.230817,psv:0.945436}}};
+/* INDICI DI MERCATO: PUN (H24 e fasce F1, F2, F3, in €/kWh) e PSV (€/Smc) medi di ogni mese, dalla tabella del punto vendita. Per aggiungere un mese basta una riga nuova in "mesi", con la chiave AAAA-MM. */
+var INDICI={fonte:"tabella PUN (H24 e fasce F1, F2, F3) e PSV del punto vendita",aggiornato:"2026-11-03",mesi:{"2026-10":{pun:0.230817,psv:0.945436,f1:0.23339,f2:0.252135,f3:0.215884},"2026-09":{pun:0.207542,psv:0.843182,f1:0.20635,f2:0.227576,f3:0.197024},"2026-08":{pun:0.179999,psv:0.686448,f1:0.174516,f2:0.204353,f3:0.171716},"2026-07":{pun:0.157038,psv:0.606612,f1:0.154201,f2:0.169384,f3:0.152256},"2026-06":{pun:0.132505,psv:0.504871,f1:0.12576,f2:0.1517,f3:0.127236},"2026-05":{pun:0.119351,psv:0.501752,f1:0.107174,f2:0.131438,f3:0.120815},"2026-04":{pun:0.119466,psv:0.492325,f1:0.111138,f2:0.138261,f3:0.116632},"2026-03":{pun:0.1434,psv:0.5997699,f1:0.143021,f2:0.153908,f3:0.138088},"2026-02":{pun:0.114405,psv:0.376788,f1:0.12228,f2:0.119837,f3:0.105296},"2026-01":{pun:0.132665,psv:0.403934,f1:0.151261,f2:0.137405,f3:0.118292},"2025-12":{pun:0.11549,psv:0.327985,f1:0.130091,f2:0.11998,f3:0.104521},"2025-11":{pun:0.117085,psv:0.348704,f1:0.129591,f2:0.124023,f3:0.10551}}};
 var MESI_IT=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+function pad2(n){return String(n).padStart(2,"0")}
 function itDate(s){var p=s.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
-function chiaveMese(off){var d=new Date(),y=d.getFullYear(),m=d.getMonth()+1-off;while(m<1){m+=12;y--}return y+"-"+String(m).padStart(2,"0")}
-function nomeMese(k){var p=k.split("-");return MESI_IT[Number(p[1])-1]+" "+p[0]}
 function r6(x){return Math.round(x*1e6)/1e6}
-function indiciPer(){
-  var k1=chiaveMese(1),k2=chiaveMese(2),a=INDICI.mesi[k1],b=INDICI.mesi[k2];
-  if($("per_m").checked){
-    if(!a)return {mens:true,manca:[nomeMese(k1)]};
-    return {pun:a.pun,psv:a.psv,mens:true,et:"mese precedente ("+nomeMese(k1)+")"};
-  }
-  var man=[];if(!a)man.push(nomeMese(k1));if(!b)man.push(nomeMese(k2));
-  if(man.length)return {mens:false,manca:man};
-  return {pun:(a.pun+b.pun)/2,psv:(a.psv+b.psv)/2,mens:false,et:"media dei due mesi precedenti ("+nomeMese(k2)+" e "+nomeMese(k1)+")"};
+function chiaveMese(off){var d=new Date(),y=d.getFullYear(),m=d.getMonth()+1-off;while(m<1){m+=12;y--}return y+"-"+pad2(m)}
+function nomeMese(k){var p=k.split("-");return MESI_IT[Number(p[1])-1]+" "+p[0]}
+function elencoMesi(da,a){
+  var re=/^\d{4}-\d{2}$/;
+  if(!re.test(da)||!re.test(a)||da>a)return [];
+  var out=[],y=Number(da.slice(0,4)),m=Number(da.slice(5,7)),ye=Number(a.slice(0,4)),me=Number(a.slice(5,7));
+  while((y<ye||(y===ye&&m<=me))&&out.length<24){out.push(y+"-"+pad2(m));m++;if(m>12){m=1;y++}}
+  return out;
+}
+function mediaMesi(p){
+  var ks=elencoMesi($(p+"_da").value.trim(),$(p+"_a").value.trim());
+  if(!ks.length)return {err:"scegli i mesi di riferimento della bolletta (dal mese e al mese)"};
+  var man=[],s={pun:0,psv:0,f1:0,f2:0,f3:0},nf=0;
+  ks.forEach(function(k){
+    var r=INDICI.mesi[k];
+    if(!r){man.push(nomeMese(k));return}
+    s.pun+=r.pun;s.psv+=r.psv;
+    if(r.f1!=null&&r.f2!=null&&r.f3!=null){s.f1+=r.f1;s.f2+=r.f2;s.f3+=r.f3;nf++}
+  });
+  if(man.length)return {manca:man};
+  var n=ks.length;
+  return {pun:s.pun/n,psv:s.psv/n,f1:nf===n?s.f1/n:null,f2:nf===n?s.f2/n:null,f3:nf===n?s.f3/n:null,
+    et:n===1?nomeMese(ks[0]):(n===2?"media di "+nomeMese(ks[0])+" e "+nomeMese(ks[1]):"media da "+nomeMese(ks[0])+" a "+nomeMese(ks[n-1])+" ("+n+" mesi)")};
 }
 function applyIndici(){
-  var v=indiciPer();
-  if(v.manca){
-    $("p_pun").value="";$("p_psv").value="";
-    $("indiciInfo").textContent="Mancano PUN e PSV di "+v.manca.join(" e ")+" nella tabella. Scrivili a mano qui sotto, oppure aggiungi il mese alla tabella.";
-    return;
+  var L=mediaMesi("l"),G=mediaMesi("g"),info=[];
+  var fs=["p_f1","p_f2","p_f3"].filter(function(id){return !!$(id)});
+  if(L.err||L.manca){
+    $("p_pun").value="";fs.forEach(function(id){$(id).value=""});
+    var mL=L.err?("Luce: "+L.err):("Luce: mancano PUN di "+L.manca.join(" e ")+" nella tabella, scrivili a mano");
+    info.push(mL);$("l_perInfo").textContent=mL;
+  }else{
+    $("p_pun").value=String(r6(L.pun)).replace(".",",");
+    if(fs.length)[L.f1,L.f2,L.f3].forEach(function(v,i){$(fs[i]).value=(v==null)?"":String(r6(v)).replace(".",",")});
+    var tL="PUN "+L.et+": "+n3(r6(L.pun),6)+" €/kWh";
+    info.push("Luce: "+tL);$("l_perInfo").textContent=tL;
   }
-  $("p_pun").value=String(r6(v.pun)).replace(".",",");
-  $("p_psv").value=String(r6(v.psv)).replace(".",",");
-  $("indiciInfo").textContent="Bolletta "+(v.mens?"mensile":"bimestrale")+": "+v.et+". PUN "+n3(r6(v.pun),6)+" €/kWh · PSV "+n3(r6(v.psv),6)+" €/Smc. Fonte: "+INDICI.fonte+" (aggiornata il "+itDate(INDICI.aggiornato)+").";
+  if(G.err||G.manca){
+    $("p_psv").value="";
+    var mG=G.err?("Gas: "+G.err):("Gas: mancano PSV di "+G.manca.join(" e ")+" nella tabella, scrivili a mano");
+    info.push(mG);$("g_perInfo").textContent=mG;
+  }else{
+    $("p_psv").value=String(r6(G.psv)).replace(".",",");
+    var tG="PSV "+G.et+": "+n3(r6(G.psv),6)+" €/Smc";
+    info.push("Gas: "+tG);$("g_perInfo").textContent=tG;
+  }
+  $("indiciInfo").textContent=info.join(" · ")+". Fonte: "+INDICI.fonte+" (aggiornata il "+itDate(INDICI.aggiornato)+").";
 }
-function setPer(v){$("per_"+v).checked=true;applyIndici()}
-function initIndici(){applyIndici();$("per_m").addEventListener("change",applyIndici);$("per_b").addEventListener("change",applyIndici)}
+function initPeriodi(){
+  ["l","g"].forEach(function(p){$(p+"_da").value=chiaveMese(2);$(p+"_a").value=chiaveMese(1);$(p+"_da").classList.remove("letto");$(p+"_a").classList.remove("letto")});
+  applyIndici();
+}
+function mesePeriodo(s,fine){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));
+  if(!m)return null;
+  var y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
+  if(fine&&d<=5){mo--;if(mo<1){mo=12;y--}}
+  else if(!fine&&d>=26){mo++;if(mo>12){mo=1;y++}}
+  return y+"-"+pad2(mo);
+}
+function setPeriodoLetto(p,d){
+  var da=mesePeriodo(d.periodo_dal,false),a=mesePeriodo(d.periodo_al,true);
+  var ok=!!(da&&a&&da<=a);
+  if(ok){$(p+"_da").value=da;$(p+"_a").value=a;$(p+"_da").classList.add("letto");$(p+"_a").classList.add("letto")}
+  applyIndici();
+  return ok;
+}
+function initIndici(){
+  initPeriodi();
+  ["l_da","l_a","g_da","g_a"].forEach(function(id){$(id).addEventListener("input",applyIndici);$(id).addEventListener("change",applyIndici)});
+}
 var $=function(id){return document.getElementById(id)};
 function num(s){
   if(s==null)return NaN; s=String(s).trim().replace(/\s|€/g,""); if(!s)return NaN;
@@ -685,16 +726,17 @@ function readBill(p){
   var kind=p==="l"?"luce":"gas";
   var btn=$(p+"_read");btn.disabled=true;setStatus(p,"","Lettura in corso, può richiedere fino a un minuto...");
   var unit=kind==="luce"?"kWh":"Smc";
-  var prompt='Le immagini sono la bolletta '+(kind==="luce"?"della luce (energia elettrica)":"del gas")+' di un cliente italiano. Leggi i dati e rispondi solo con un oggetto JSON con queste chiavi. Usa numeri con il punto decimale. Scrivi null quando un dato non è chiaramente leggibile e non indovinare mai.\nMODELLO BASE (vale per tutti i gestori, luce e gas, bollette da luglio 2025, struttura imposta da ARERA): la prima parte è il frontespizio con il totale da pagare; poi lo "Scontrino dell\'energia" con le righe "Quota per consumi", "Quota fissa" e (solo luce) "Quota potenza"; ogni quota è divisa in "di cui spesa per la vendita" e "di cui spesa per la rete e gli oneri generali di sistema". Il confronto riguarda SOLO la parte "vendita": quota_energia = "spesa per la vendita" della Quota per consumi; quota_fissa = "spesa per la vendita" della Quota fissa. Mai usare le parti rete/oneri e mai la quota potenza. Il "Box dell\'offerta" riporta "Totale di spesa dovuto per l\'offerta" con il "di cui quota fissa" e il "di cui quota consumi": serve per controllare che quota_energia + quota_fissa coincidano. Consumo annuo e "Spesa annua" (esclude canone TV e altre partite) sono nelle "Informazioni storiche" o nel riquadro "consumo annuo" del frontespizio. Se la bolletta è precedente a luglio 2025 non ha lo scontrino: cerca nel riepilogo la "Spesa per la materia energia/gas" divisa in quota energia (consumi) e quota fissa (commercializzazione), senza trasporto, oneri e imposte. Il consumo e le spese sono del periodo fatturato di questa bolletta.\nMODELLI NOTI PER GESTORE (usali solo se il fornitore coincide e il servizio è lo stesso):\n'+profiliTesto()+'\nPer gli altri gestori cerca le stesse voci con il criterio generale sopra.\n{"giorni_periodo": giorni del periodo fatturato (dal "Periodo di riferimento"),\n"consumo_periodo": '+unit+' fatturati nel periodo,\n"consumo_annuo": consumo annuo in '+unit+' dalle "Informazioni storiche" o dal riquadro consumo annuo (totale di tutte le fasce), altrimenti null,\n"spesa_annua": "Spesa annua sostenuta" (IVA compresa) delle informazioni storiche, altrimenti null,\n"quota_energia": euro della "spesa per la vendita" riferita alla quota consumi (somma di tutte le fasce, senza quota fissa),\n"quota_fissa": euro della "spesa per la vendita" riferita alla quota fissa (commercializzazione/vendita del periodo; NON la quota potenza e NON la parte rete e oneri),\n"totale_senza_canone_tv": euro del "Totale bolletta" o totale dei consumi, PRIMA di aggiungere il canone TV,\n"canone_tv": euro di canone TV addebitato nel periodo, altrimenti null,\n"totale_da_pagare": totale da pagare riportato in prima pagina,\n"prezzo_energia": prezzo unitario di vendita in euro per '+unit+' se riportato, altrimenti null,\n"potenza_kw": potenza impegnata in kW oppure null,\n"fornitore": nome del fornitore,\n"tipo_offerta": "fisso" o "indicizzato" se indicato nel Box dell\'offerta, altrimenti null,\n"note": una frase su cosa è poco leggibile, oppure null}\nNon includere ricalcoli, arretrati, interessi o altri addebiti.';
+  var prompt='Le immagini sono la bolletta '+(kind==="luce"?"della luce (energia elettrica)":"del gas")+' di un cliente italiano. Leggi i dati e rispondi solo con un oggetto JSON con queste chiavi. Usa numeri con il punto decimale. Scrivi null quando un dato non è chiaramente leggibile e non indovinare mai.\nMODELLO BASE (vale per tutti i gestori, luce e gas, bollette da luglio 2025, struttura imposta da ARERA): la prima parte è il frontespizio con il totale da pagare; poi lo "Scontrino dell\'energia" con le righe "Quota per consumi", "Quota fissa" e (solo luce) "Quota potenza"; ogni quota è divisa in "di cui spesa per la vendita" e "di cui spesa per la rete e gli oneri generali di sistema". Il confronto riguarda SOLO la parte "vendita": quota_energia = "spesa per la vendita" della Quota per consumi; quota_fissa = "spesa per la vendita" della Quota fissa. Mai usare le parti rete/oneri e mai la quota potenza. Il "Box dell\'offerta" riporta "Totale di spesa dovuto per l\'offerta" con il "di cui quota fissa" e il "di cui quota consumi": serve per controllare che quota_energia + quota_fissa coincidano. Consumo annuo e "Spesa annua" (esclude canone TV e altre partite) sono nelle "Informazioni storiche" o nel riquadro "consumo annuo" del frontespizio. Se la bolletta è precedente a luglio 2025 non ha lo scontrino: cerca nel riepilogo la "Spesa per la materia energia/gas" divisa in quota energia (consumi) e quota fissa (commercializzazione), senza trasporto, oneri e imposte. Il consumo e le spese sono del periodo fatturato di questa bolletta.\nMODELLI NOTI PER GESTORE (usali solo se il fornitore coincide e il servizio è lo stesso):\n'+profiliTesto()+'\nPer gli altri gestori cerca le stesse voci con il criterio generale sopra.\n{"giorni_periodo": giorni del periodo fatturato (dal "Periodo di riferimento"),\n"periodo_dal": data di inizio del periodo fatturato in formato AAAA-MM-GG, altrimenti null,\n"periodo_al": data di fine del periodo fatturato in formato AAAA-MM-GG, altrimenti null,\n"consumo_periodo": '+unit+' fatturati nel periodo,\n"consumo_annuo": consumo annuo in '+unit+' dalle "Informazioni storiche" o dal riquadro consumo annuo (totale di tutte le fasce), altrimenti null,\n"spesa_annua": "Spesa annua sostenuta" (IVA compresa) delle informazioni storiche, altrimenti null,\n"quota_energia": euro della "spesa per la vendita" riferita alla quota consumi (somma di tutte le fasce, senza quota fissa),\n"quota_fissa": euro della "spesa per la vendita" riferita alla quota fissa (commercializzazione/vendita del periodo; NON la quota potenza e NON la parte rete e oneri),\n"totale_senza_canone_tv": euro del "Totale bolletta" o totale dei consumi, PRIMA di aggiungere il canone TV,\n"canone_tv": euro di canone TV addebitato nel periodo, altrimenti null,\n"totale_da_pagare": totale da pagare riportato in prima pagina,\n"prezzo_energia": prezzo unitario di vendita in euro per '+unit+' se riportato, altrimenti null,\n"potenza_kw": potenza impegnata in kW oppure null,\n"fornitore": nome del fornitore,\n"tipo_offerta": "fisso" o "indicizzato" se indicato nel Box dell\'offerta, altrimenti null,\n"note": una frase su cosa è poco leggibile, oppure null}\nNon includere ricalcoli, arretrati, interessi o altri addebiti.';
   prepImages(files,(limits&&limits.images)?limits.images.maxCount:6).then(function(imgs){return askBill(prompt,imgs)}).then(function(d){
     var ok=[];
     function put(id,v,dec){if(v!=null&&isFinite(Number(v))){$(id).value=String(Number(v).toFixed(dec)).replace(".",",");ok.push(id)}}
     put(p+"_giorni",d.giorni_periodo,0);put(p+"_cons",d.consumo_periodo,0);
-    if(d.giorni_periodo!=null){var gp=Number(d.giorni_periodo);if(gp>=25&&gp<=35)setPer("m");else if(gp>=55&&gp<=70)setPer("b")}
+    var okp=setPeriodoLetto(p,d);
     if(d.consumo_annuo!=null)put(p+"_consAnn",d.consumo_annuo,0);
     put(p+"_en",d.quota_energia,2);put(p+"_fix",d.quota_fissa,2);
     if(d.spesa_annua!=null)put(p+"_totAnn",d.spesa_annua,2);
     var warn=[];
+    if(!okp)warn.push("mesi di riferimento non letti: controlla il periodo della bolletta");
     var tsc=d.totale_senza_canone_tv;
     if(tsc==null&&d.totale_da_pagare!=null)tsc=Number(d.totale_da_pagare)-(Number(d.canone_tv)||0);
     if(tsc!=null)put(p+"_tot",tsc,2);else warn.push("totale della bolletta non letto");
@@ -758,7 +800,7 @@ function go(n){
   window.scrollTo(0,0);
 }
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-go]");if(b)go(Number(b.getAttribute("data-go")))});
-$("newBtn").addEventListener("click",function(){$("clearExample").click();["l","g"].forEach(function(p){setStatus(p,"","");$(p+"_file").value="";$(p+"_read").disabled=true});go(1)});
+$("newBtn").addEventListener("click",function(){$("clearExample").click();["l","g"].forEach(function(p){setStatus(p,"","");$(p+"_file").value="";$(p+"_read").disabled=true});initPeriodi();go(1)});
 initIndici();renderListino();calc();initRead();
 })();
 </script>
