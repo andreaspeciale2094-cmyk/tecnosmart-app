@@ -533,6 +533,19 @@ $('b-copy').addEventListener('click',function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('Testo copiato, puoi incollarlo su WhatsApp.');},fallback);}
   else fallback();
 });
+/* Archivio preventivi (solo Amministratore): quando il preventivo viene stampato, inviato o copiato
+   avvisa l'app (se la pagina e' aperta dentro l'app) con nome cliente e tipo di offerta (kit). */
+var lastLogged='';
+function notifyApp(){
+  try{
+    if(!(window.parent&&window.parent!==window))return;
+    var nome=client().nome,off=kitOf().name,key=nome+'|'+off;
+    if(key===lastLogged)return;
+    lastLogged=key;
+    window.parent.postMessage({type:'tecnosmart-preventivo',cliente:nome,offerta:off},'*');
+  }catch(e){}
+}
+['b-print','b-mail','b-copy'].forEach(function(id){var el=$(id);if(el)el.addEventListener('click',notifyApp);});
 var newArmed=false,newT;
 $('b-new').addEventListener('click',function(){
   if(!newArmed){newArmed=true;this.textContent='Tocca ancora per cancellare';clearTimeout(newT);var b=this;newT=setTimeout(function(){newArmed=false;b.textContent='Nuovo preventivo';},3500);return;}
